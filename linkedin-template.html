@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkedIn Content Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#060810;--bg2:#04060f;--bg3:#0a0f1e;--border:#141c30;--border2:#1c2640;--txt:#e2e8f0;--txt2:#7a8fb0;--txt3:#3a4a6a;--txt4:#252f4a;--accent:#5865f2;--accent2:#57f287;--accent3:#a78bfa;--inp:#060810;--ba:#5865f2;--bb:#57f287;}
+body.sk-l{--bg:#f1f5f9;--bg2:#e8edf5;--bg3:#fff;--border:#cbd5e1;--border2:#94a3b8;--txt:#0f172a;--txt2:#334155;--txt3:#64748b;--txt4:#94a3b8;--accent:#4752c4;--accent2:#16a34a;--accent3:#7c3aed;--inp:#f8fafc;--ba:#4752c4;--bb:#16a34a;}
+body.sk-g{--bg:#030a03;--bg2:#040d04;--bg3:#071007;--border:#0d2b0d;--border2:#1a4a1a;--txt:#c8ffc8;--txt2:#6abf6a;--txt3:#2d7a2d;--txt4:#1a4a1a;--accent:#00ff41;--accent2:#39ff14;--accent3:#00cc33;--inp:#030a03;--ba:#00ff41;--bb:#39ff14;}
+body{font-family:"Plus Jakarta Sans",sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;transition:background .3s,color .3s;}
+
+/* ── SETUP WIZARD ── */
+#setupOverlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
+#setupBox{background:var(--bg3);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:580px;max-height:92vh;overflow-y:auto;padding:28px 32px;}
+#setupBox::-webkit-scrollbar{width:4px;}
+#setupBox::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.wz-logo{font-family:"Syne",sans-serif;font-size:.9rem;font-weight:900;background:linear-gradient(135deg,var(--ba),var(--bb));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:5px;}
+.wz-title{font-family:"Syne",sans-serif;font-size:1.35rem;font-weight:900;color:var(--txt);margin-bottom:6px;}
+.wz-sub{font-size:.78rem;color:var(--txt2);line-height:1.6;margin-bottom:24px;}
+.wz-sec{margin-bottom:20px;}
+.wz-sec-title{font-size:.62rem;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--txt4);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.wz-num{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:.63rem;font-weight:900;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.wz-g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.wz-f{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.wz-lbl{font-size:.72rem;font-weight:700;color:var(--txt2);}
+.wz-hint{font-size:.63rem;color:var(--txt3);margin-top:1px;}
+.wz-inp{background:var(--inp);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--txt);font-family:"Plus Jakarta Sans",sans-serif;font-size:.8rem;outline:none;transition:border-color .15s;width:100%;}
+.wz-inp:focus{border-color:var(--accent);}
+.wz-inp::placeholder{color:var(--txt3);}
+textarea.wz-inp{resize:vertical;min-height:72px;line-height:1.6;}
+.wz-div{height:1px;background:var(--border);margin:18px 0;}
+.wz-tone{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.wz-tb{padding:11px 6px;border-radius:9px;border:1px solid var(--border);background:none;cursor:pointer;color:var(--txt3);transition:all .15s;text-align:center;font-family:"Plus Jakarta Sans",sans-serif;}
+.wz-tb:hover{border-color:var(--txt4);color:var(--txt2);}
+.wz-tb.on{background:rgba(88,101,242,.12);border-color:var(--accent);color:var(--txt);}
+.wz-tb-i{font-size:1.3rem;display:block;margin-bottom:5px;}
+.wz-tb-n{font-size:.72rem;font-weight:700;display:block;}
+.wz-tb-s{font-size:.6rem;color:var(--txt3);display:block;margin-top:3px;}
+.wz-tb.on .wz-tb-s{color:var(--accent);opacity:.8;}
+.t3row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.wz-ck{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.wz-ck input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;}
+.wz-ck label{font-size:.75rem;color:var(--txt2);cursor:pointer;font-weight:500;}
+.wz-btn{width:100%;padding:14px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--ba),var(--bb));color:#fff;font-family:"Syne",sans-serif;font-size:.9rem;font-weight:900;cursor:pointer;transition:all .2s;margin-top:6px;}
+.wz-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(88,101,242,.35);}
+.wz-reset{width:100%;padding:9px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--txt3);font-family:"Syne",sans-serif;font-size:.72rem;cursor:pointer;margin-top:8px;}
+.wz-addon{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-top:20px;}
+.wz-addon-lbl{font-size:.6rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--accent2);opacity:.85;margin-bottom:7px;}
+.wz-addon-txt{font-size:.75rem;color:var(--txt2);line-height:1.6;}
+.wz-addon-price{font-family:"Syne",sans-serif;font-size:1rem;font-weight:900;color:var(--accent2);margin-top:8px;}
+.wz-addon-sub{font-size:.63rem;color:var(--txt3);}
+
+/* ── MAIN APP ── */
+.shell{display:grid;grid-template-columns:258px 1fr;height:100vh;overflow:hidden;}
+.sb{background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sb-head{padding:16px 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sb-brand{font-family:"Syne",sans-serif;font-size:.85rem;font-weight:900;background:linear-gradient(135deg,var(--ba),var(--bb));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sb-sub{font-size:.58rem;color:var(--txt4);margin-top:2px;}
+.sk-row{display:flex;align-items:center;gap:6px;margin-top:10px;}
+.sk{width:26px;height:26px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .2s;}
+.sk:hover{transform:scale(1.15);}
+.sk.on{border-color:var(--txt);}
+.sk-dark{background:linear-gradient(135deg,#060810,#5865f2);}
+.sk-light{background:linear-gradient(135deg,#f1f5f9,#4752c4);}
+.sk-green{background:linear-gradient(135deg,#030a03,#00ff41);}
+.sb-scroll{flex:1;overflow-y:auto;padding:6px 0 16px;}
+.sb-scroll::-webkit-scrollbar{width:3px;}
+.sb-scroll::-webkit-scrollbar-thumb{background:var(--border);}
+.sblbl{padding:10px 16px 4px;font-size:.54rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt4);}
+.sdiv{height:1px;background:var(--border);margin:6px 0;}
+.ph-hdr{padding:7px 16px 3px;display:flex;align-items:center;gap:7px;}
+.ph-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.ph-lbl{font-size:.6rem;font-weight:700;}
+.pb{display:block;width:100%;text-align:left;padding:7px 16px 7px 24px;border:none;background:none;cursor:pointer;color:var(--txt3);transition:all .15s;border-left:2px solid transparent;font-family:"Plus Jakarta Sans",sans-serif;}
+.pb:hover{background:rgba(88,101,242,.06);color:var(--txt2);}
+.pb.on{background:rgba(88,101,242,.12);border-left-color:var(--pc,var(--accent));color:var(--txt);}
+.pb-n{font-weight:700;font-size:.73rem;}
+.pb-s{font-size:.58rem;color:var(--txt4);margin-top:1px;}
+.pb.on .pb-s{color:var(--pc,var(--accent));opacity:.7;}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:5px 16px;}
+.tb{padding:7px 5px;border-radius:7px;border:1px solid var(--border);background:none;cursor:pointer;color:var(--txt3);transition:all .15s;text-align:center;}
+.tb:hover{border-color:var(--txt4);color:var(--txt2);}
+.tb.on{background:rgba(87,242,135,.1);border-color:var(--accent2);color:var(--txt);}
+.ti{font-size:1rem;display:block;margin-bottom:2px;}
+.tn{font-size:.62rem;font-weight:700;display:block;}
+.ts{font-size:.53rem;color:var(--txt4);display:block;margin-top:1px;}
+.tb.on .ts{color:var(--accent2);}
+.tips-box{margin:0 16px 8px;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;}
+.tip{font-size:.62rem;color:var(--txt3);line-height:1.85;display:flex;gap:5px;}
+.tip span{color:var(--accent);flex-shrink:0;}
+.gbtn{margin:8px 16px 4px;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--ba),var(--accent));color:#fff;font-family:"Syne",sans-serif;font-size:.75rem;font-weight:900;cursor:pointer;transition:all .2s;display:block;width:calc(100% - 32px);}
+.gbtn:hover{transform:translateY(-1px);}
+.cbtn{margin:0 16px 6px;padding:8px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--accent);font-family:"Syne",sans-serif;font-size:.68rem;font-weight:700;cursor:pointer;display:block;width:calc(100% - 32px);}
+.cbtn:hover{background:rgba(88,101,242,.08);}
+.main{overflow-y:auto;background:var(--bg);padding:22px;}
+.main::-webkit-scrollbar{width:4px;}
+.main::-webkit-scrollbar-thumb{background:var(--border);}
+.tabs{display:flex;gap:3px;background:var(--bg2);padding:4px;border-radius:9px;max-width:640px;margin-bottom:18px;}
+.tab{flex:1;padding:8px;border-radius:6px;border:none;background:none;cursor:pointer;font-family:"Syne",sans-serif;font-size:.7rem;font-weight:800;color:var(--txt4);text-align:center;transition:all .15s;}
+.tab.on{background:var(--border);color:var(--txt);}
+.pg{display:none;}
+.pg.on{display:block;}
+.ai-type{padding:8px 6px;border-radius:7px;border:1px solid var(--border);background:none;cursor:pointer;color:var(--txt3);transition:all .15s;text-align:center;font-family:"Plus Jakarta Sans",sans-serif;}
+.ai-type.on{background:rgba(87,242,135,.1);border-color:var(--accent2);color:var(--txt);}
+.ai-len{padding:7px 12px;border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;font-size:.65rem;font-weight:700;color:var(--txt3);font-family:"Plus Jakarta Sans",sans-serif;}
+.ai-len.on{background:rgba(87,242,135,.1);border-color:var(--accent2);color:var(--txt);}
+.phase-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:50px;font-size:.63rem;font-weight:700;margin-bottom:14px;}
+/* LinkedIn card */
+.li-card{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:16px;max-width:580px;}
+.li-top{padding:14px 16px 12px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--border);}
+.li-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--ba),var(--bb));display:flex;align-items:center;justify-content:center;font-family:"Syne",sans-serif;font-size:.9rem;font-weight:900;color:#fff;flex-shrink:0;}
+.li-nm{font-weight:700;font-size:.84rem;}
+.li-hl{font-size:.65rem;color:var(--txt3);margin-top:1px;}
+.li-bd{padding:14px 16px;font-size:.82rem;color:var(--txt2);line-height:1.8;white-space:pre-wrap;max-height:420px;overflow-y:auto;}
+.li-bd::-webkit-scrollbar{width:3px;}
+.li-ft{padding:9px 16px;border-top:1px solid var(--border);display:flex;gap:10px;}
+.li-r{font-size:.65rem;color:var(--txt3);display:flex;align-items:center;gap:4px;cursor:pointer;padding:3px 7px;border-radius:5px;}
+.li-r:hover{background:rgba(128,128,128,.08);color:var(--txt2);}
+/* Text boxes */
+.txt-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;max-width:580px;}
+.txt-ttl{font-size:.56rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--txt4);margin-bottom:8px;}
+.txt-body{font-size:.78rem;color:var(--txt2);line-height:1.8;white-space:pre-wrap;}
+.cta-box{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:11px 14px;margin-bottom:10px;max-width:580px;}
+.cta-ttl{font-size:.55rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--accent2);opacity:.7;margin-bottom:5px;}
+.cta-body{font-size:.75rem;color:var(--accent2);font-family:"Space Mono",monospace;}
+.htag-box{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:11px 14px;max-width:580px;}
+.htag-ttl{font-size:.55rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--txt4);margin-bottom:5px;}
+.htag-body{font-size:.6rem;color:var(--txt3);line-height:1.9;font-family:"Space Mono",monospace;word-break:break-all;}
+/* Analytics */
+.sum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;max-width:640px;}
+.sum-c{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+.sum-n{font-family:"Syne",sans-serif;font-size:1.4rem;font-weight:900;color:var(--accent);}
+.sum-l{font-size:.6rem;color:var(--txt4);margin-top:3px;}
+.sum-s{font-size:.57rem;color:var(--txt4);margin-top:2px;opacity:.6;}
+.inp-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;max-width:760px;}
+.inp-title{font-size:.58rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--txt4);margin-bottom:4px;}
+.inp-hint{font-size:.62rem;color:var(--txt3);margin-bottom:12px;}
+.inp-hdr{display:grid;grid-template-columns:145px repeat(6,1fr);gap:4px;margin-bottom:5px;}
+.inp-col{font-size:.54rem;font-weight:700;color:var(--txt4);text-align:center;letter-spacing:.5px;text-transform:uppercase;padding-bottom:3px;}
+.inp-row{display:grid;grid-template-columns:145px repeat(6,1fr);gap:4px;margin-bottom:4px;align-items:center;}
+.inp-lbl{font-size:.68rem;color:var(--txt2);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.inp-day{font-size:.57rem;color:var(--txt3);display:block;}
+.inp-f{background:var(--inp);border:1px solid var(--border);border-radius:5px;padding:5px 6px;color:var(--txt);font-family:"Space Mono",monospace;font-size:.7rem;width:100%;text-align:center;outline:none;}
+.inp-f:focus{border-color:var(--accent);}
+.btns-row{margin-top:12px;display:flex;gap:8px;}
+.save-btn{padding:8px 20px;border-radius:7px;border:none;background:var(--accent);color:#fff;font-family:"Syne",sans-serif;font-size:.7rem;font-weight:800;cursor:pointer;}
+.save-btn:hover{opacity:.85;}
+.clr-btn{padding:8px 14px;border-radius:7px;border:1px solid var(--border);background:none;color:var(--txt3);font-family:"Syne",sans-serif;font-size:.7rem;cursor:pointer;}
+.chart-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;max-width:760px;}
+.chart-title{font-size:.58rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--txt4);margin-bottom:12px;}
+.metric-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.mt{padding:4px 11px;border-radius:50px;border:1px solid var(--border);background:none;cursor:pointer;font-size:.6rem;font-weight:700;color:var(--txt3);font-family:"Plus Jakarta Sans",sans-serif;}
+.mt.on{background:rgba(88,101,242,.15);border-color:var(--accent);color:var(--accent3);}
+.chart-rows{display:flex;flex-direction:column;gap:6px;}
+.ch-row{display:flex;align-items:center;gap:9px;}
+.ch-lbl{font-size:.62rem;color:var(--txt3);width:50px;flex-shrink:0;text-align:right;font-family:"Space Mono",monospace;}
+.ch-bg{flex:1;background:var(--bg);border-radius:3px;height:16px;overflow:hidden;position:relative;}
+.ch-bar{height:100%;border-radius:3px;transition:width .55s ease;}
+.ch-bar-lbl{position:absolute;left:7px;top:50%;transform:translateY(-50%);font-size:.57rem;font-weight:700;color:rgba(255,255,255,.5);white-space:nowrap;}
+.ch-val{font-size:.6rem;font-family:"Space Mono",monospace;color:var(--txt3);width:54px;flex-shrink:0;text-align:right;}
+.tbl-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;max-width:760px;}
+.atbl{width:100%;border-collapse:collapse;font-size:.7rem;}
+.atbl th{background:var(--bg2);padding:8px 9px;text-align:center;font-size:.54rem;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--txt4);border-bottom:1px solid var(--border);}
+.atbl th:first-child{text-align:left;padding-left:14px;}
+.atbl td{padding:8px 9px;border-bottom:1px solid var(--bg2);text-align:center;color:var(--txt2);font-family:"Space Mono",monospace;font-size:.67rem;}
+.atbl td:first-child{text-align:left;font-family:"Plus Jakarta Sans",sans-serif;font-weight:600;color:var(--txt);padding-left:14px;}
+.atbl tr:last-child td{border-bottom:none;}
+.hi{color:#57f287!important;font-weight:700;}
+.er-c{color:var(--accent)!important;}
+.top-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;max-width:760px;}
+.top-title{font-size:.58rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--txt4);margin-bottom:12px;}
+.top-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bg2);}
+.top-item:last-child{border-bottom:none;}
+.top-rank{font-family:"Syne",sans-serif;font-size:1rem;font-weight:900;color:var(--txt4);width:26px;flex-shrink:0;text-align:center;}
+.r1{color:#fbbf24!important;}.r2{color:#94a3b8!important;}.r3{color:#b45309!important;}
+.top-info{flex:1;min-width:0;}
+.top-name{font-size:.77rem;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.top-meta{font-size:.6rem;color:var(--txt3);margin-top:2px;}
+.top-stats{display:flex;gap:10px;flex-shrink:0;}
+.top-stat{font-size:.65rem;font-family:"Space Mono",monospace;color:var(--accent);text-align:center;min-width:36px;}
+.top-stat-l{font-size:.5rem;color:var(--txt4);display:block;margin-top:1px;}
+.ins-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px;max-width:760px;}
+.ins-title{font-size:.58rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--accent2);opacity:.7;margin-bottom:10px;}
+.ins-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.ins-dot{width:6px;height:6px;border-radius:50%;background:var(--accent2);flex-shrink:0;margin-top:5px;}
+.ins-txt{font-size:.73rem;color:var(--txt2);line-height:1.55;}
+.ins-txt strong{color:var(--accent2);}
+.empty{text-align:center;padding:36px 20px;color:var(--txt4);}
+.empty-ic{font-size:1.8rem;margin-bottom:8px;opacity:.35;}
+.empty-tx{font-size:.75rem;}
+.sk-row{display:flex;align-items:center;gap:6px;margin-top:10px;}
+.toast{position:fixed;bottom:18px;right:18px;background:var(--bg3);color:var(--txt);padding:10px 18px;border-radius:8px;font-size:.73rem;font-weight:600;border:1px solid var(--border2);box-shadow:0 4px 20px rgba(0,0,0,.4);z-index:10000;display:none;}
+.toast.on{display:block;}
+body.sk-g .gbtn{color:#000;}
+body.sk-l .li-bd{color:#334155;}
+body.sk-l .ch-bg{background:#e2e8f0;}
+</style>
+</head>
+<body>
+<div id="setupOverlay">
+<div id="setupBox">
+  <div class="wz-logo">✦ LinkedIn Content Generator</div>
+  <div class="wz-title">Setup Brand Kamu 🚀</div>
+  <div class="wz-sub">Isi data di bawah — semua 40 post, AI prompt, dan analytics akan otomatis disesuaikan dengan brand kamu. Hanya perlu dilakukan sekali.</div>
+
+  <div class="wz-sec">
+    <div class="wz-sec-title"><span class="wz-num">1</span>Identitas LinkedIn</div>
+    <div class="wz-g2">
+      <div class="wz-f"><label class="wz-lbl">Nama Lengkap *</label><input class="wz-inp" id="w-name" placeholder="Budi Santoso"></div>
+      <div class="wz-f"><label class="wz-lbl">Inisial (avatar)</label><input class="wz-inp" id="w-init" placeholder="BS" maxlength="2"><span class="wz-hint">1-2 huruf, muncul di preview post</span></div>
+    </div>
+    <div class="wz-f"><label class="wz-lbl">Headline LinkedIn *</label><input class="wz-inp" id="w-headline" placeholder="Brand Strategist for scaling D2C brands"><span class="wz-hint">Tagline profil LinkedIn — muncul di setiap preview post</span></div>
+  </div>
+
+  <div class="wz-div"></div>
+
+  <div class="wz-sec">
+    <div class="wz-sec-title"><span class="wz-num">2</span>Layanan & Target Klien</div>
+    <div class="wz-f"><label class="wz-lbl">Jenis Layanan / Bisnis *</label><input class="wz-inp" id="w-service" placeholder="Brand strategy consultant untuk D2C brand"><span class="wz-hint">Satu kalimat — apa yang kamu jual dan untuk siapa</span></div>
+    <div class="wz-g2">
+      <div class="wz-f"><label class="wz-lbl">Target Klien Ideal *</label><input class="wz-inp" id="w-target" placeholder="founder D2C brand, revenue 1M+/tahun"></div>
+      <div class="wz-f"><label class="wz-lbl">Pain Point Utama *</label><input class="wz-inp" id="w-pain" placeholder="brand nggak stand out di market"></div>
+    </div>
+    <div class="wz-f"><label class="wz-lbl">Hasil / Transformation *</label><input class="wz-inp" id="w-result" placeholder="brand identity kuat → customer loyalty naik → revenue growth"><span class="wz-hint">Yang klien dapatkan setelah bekerja sama dengan kamu</span></div>
+  </div>
+
+  <div class="wz-div"></div>
+
+  <div class="wz-sec">
+    <div class="wz-sec-title"><span class="wz-num">3</span>Case Study / Bukti Nyata</div>
+    <div class="wz-f"><label class="wz-lbl">Case Study 1 (wajib) *</label><textarea class="wz-inp" id="w-case1" placeholder="Contoh: Brand X (startup F&B) — sebelum: brand nggak dikenal, after: masuk Top 10 brand F&B Instagram dalam 3 bulan. Revenue naik 40%."></textarea></div>
+    <div class="wz-f"><label class="wz-lbl">Case Study 2 (opsional)</label><textarea class="wz-inp" id="w-case2" placeholder="Opsional — tambah jika punya"></textarea></div>
+  </div>
+
+  <div class="wz-div"></div>
+
+  <div class="wz-sec">
+    <div class="wz-sec-title"><span class="wz-num">4</span>Paket Harga</div>
+    <div class="wz-f"><label class="wz-lbl">Paket 1 — Entry *</label>
+      <div class="t3row" style="margin-top:6px;"><input class="wz-inp" id="w-t1n" placeholder="Nama" value="Quick Audit"><input class="wz-inp" id="w-t1p" placeholder="Harga" value="Rp 500.000"><input class="wz-inp" id="w-t1d" placeholder="Deskripsi" value="1x sesi review"></div>
+    </div>
+    <div class="wz-f"><label class="wz-lbl">Paket 2 — Core *</label>
+      <div class="t3row" style="margin-top:6px;"><input class="wz-inp" id="w-t2n" placeholder="Nama" value="Brand Sprint"><input class="wz-inp" id="w-t2p" placeholder="Harga" value="Rp 5.000.000"><input class="wz-inp" id="w-t2d" placeholder="Deskripsi" value="4 minggu intensive"></div>
+    </div>
+    <div class="wz-ck"><input type="checkbox" id="w-t3on" checked><label for="w-t3on">Tambah Paket 3 (opsional)</label></div>
+    <div id="w-t3wrap" class="wz-f"><label class="wz-lbl">Paket 3 — Premium</label>
+      <div class="t3row" style="margin-top:6px;"><input class="wz-inp" id="w-t3n" placeholder="Nama" value="Full System"><input class="wz-inp" id="w-t3p" placeholder="Harga" value="Rp 15.000.000"><input class="wz-inp" id="w-t3d" placeholder="Deskripsi" value="3 bulan full support"></div>
+    </div>
+  </div>
+
+  <div class="wz-div"></div>
+
+  <div class="wz-sec">
+    <div class="wz-sec-title"><span class="wz-num">5</span>CTA & Hashtag</div>
+    <div class="wz-g2">
+      <div class="wz-f"><label class="wz-lbl">CTA Utama *</label><input class="wz-inp" id="w-cta" placeholder='DM "Brand Audit"'><span class="wz-hint">Ajakan aksi di akhir setiap post</span></div>
+      <div class="wz-f"><label class="wz-lbl">Keyword DM *</label><input class="wz-inp" id="w-dm" placeholder="Brand Audit"><span class="wz-hint">Kata kunci yang diminta di-DM</span></div>
+    </div>
+    <div class="wz-f"><label class="wz-lbl">Hashtag (5-10, pisahkan spasi) *</label><input class="wz-inp" id="w-ht" placeholder="#brandstrategy #d2cbrand #founderlife #brandidentity #scalingbrand"></div>
+  </div>
+
+  <div class="wz-div"></div>
+
+  <div class="wz-sec">
+    <div class="wz-sec-title"><span class="wz-num">6</span>Tone Bahasa Default</div>
+    <div class="wz-tone">
+      <button class="wz-tb on" id="wt-mix" onclick="setWTone('mix',this)"><span class="wz-tb-i">🔀</span><span class="wz-tb-n">Mix</span><span class="wz-tb-s">Indo-English</span></button>
+      <button class="wz-tb" id="wt-en" onclick="setWTone('en',this)"><span class="wz-tb-i">🇬🇧</span><span class="wz-tb-n">English</span><span class="wz-tb-s">Full English</span></button>
+      <button class="wz-tb" id="wt-id" onclick="setWTone('id',this)"><span class="wz-tb-i">🇮🇩</span><span class="wz-tb-n">Bahasa</span><span class="wz-tb-s">Full Indonesia</span></button>
+    </div>
+  </div>
+
+  <button class="wz-btn" onclick="finishSetup()">✦ Setup Selesai — Buka Generator</button>
+  <button class="wz-reset" onclick="resetApp()">↺ Reset & Mulai Ulang</button>
+
+  <div class="wz-addon">
+    <div class="wz-addon-lbl">✨ Add-on: Setup Done-for-You</div>
+    <div class="wz-addon-txt">Tidak mau isi sendiri? Kami bisa setup app ini lengkap untuk kamu — 40 post disesuaikan dengan niche, case study, dan tone brand kamu. Tinggal download dan pakai.</div>
+    <div class="wz-addon-price">Hubungi penjual <span class="wz-addon-sub">untuk info harga setup service</span></div>
+  </div>
+</div>
+</div>
+
+<!-- MAIN APP -->
+<div class="shell" id="mainApp" style="display:none;">
+<aside class="sb">
+  <div class="sb-head">
+    <div class="sb-brand" id="appBrand">LinkedIn Generator</div>
+    <div class="sb-sub" id="appSub">40 Posts · Analytics · AI Generate</div>
+    <div class="sk-row">
+      <span style="font-size:.52rem;font-weight:700;color:var(--txt4);text-transform:uppercase;letter-spacing:.5px;">Skin:</span>
+      <button class="sk sk-dark on" id="sk-dark" onclick="setSkin('dark')"></button>
+      <button class="sk sk-light" id="sk-light" onclick="setSkin('light')"></button>
+      <button class="sk sk-green" id="sk-green" onclick="setSkin('green')"></button>
+    </div>
+  </div>
+  <div class="sb-scroll">
+    <div class="sblbl">40 Posts — Pilih Hari</div>
+    <div class="ph-hdr"><div class="ph-dot" style="background:#5865f2;"></div><span class="ph-lbl" style="color:#5865f2;">Phase 1 — Foundation (Day 1-7)</span></div><div id="ph1"></div>
+    <div class="ph-hdr" style="margin-top:4px;"><div class="ph-dot" style="background:#a78bfa;"></div><span class="ph-lbl" style="color:#a78bfa;">Phase 2 — Education (Day 8-14)</span></div><div id="ph2"></div>
+    <div class="ph-hdr" style="margin-top:4px;"><div class="ph-dot" style="background:#57f287;"></div><span class="ph-lbl" style="color:#57f287;">Phase 3 — Conversion (Day 15-20)</span></div><div id="ph3"></div>
+    <div class="ph-hdr" style="margin-top:4px;"><div class="ph-dot" style="background:#fb923c;"></div><span class="ph-lbl" style="color:#fb923c;">Phase 4 — Scale (Day 21-27)</span></div><div id="ph4"></div>
+    <div class="ph-hdr" style="margin-top:4px;"><div class="ph-dot" style="background:#22d3ee;"></div><span class="ph-lbl" style="color:#22d3ee;">Phase 5 — Authority (Day 28-34)</span></div><div id="ph5"></div>
+    <div class="ph-hdr" style="margin-top:4px;"><div class="ph-dot" style="background:#f472b6;"></div><span class="ph-lbl" style="color:#f472b6;">Phase 6 — Closing 2.0 (Day 35-40)</span></div><div id="ph6"></div>
+    <div class="sdiv"></div>
+    <div class="sblbl">Tone</div>
+    <div class="tgrid" id="TG"></div>
+    <div class="sdiv"></div>
+    <button class="gbtn" onclick="showPost()">⚡ Tampilkan Post</button>
+    <button class="cbtn" onclick="copyPost()">📋 Copy Post + Hashtag</button>
+    <div class="sdiv"></div>
+    <div class="tips-box">
+      <div class="tip"><span>⏰</span>Post jam 8-9 pagi atau 5-6 sore</div>
+      <div class="tip"><span>💬</span>Balas komentar dalam 2 jam pertama</div>
+      <div class="tip"><span>📌</span>Pin post terbaik ke profil</div>
+      <div class="tip"><span>↺</span><button onclick="showSetup()" style="background:none;border:none;color:var(--txt3);font-size:.62rem;cursor:pointer;padding:0;font-family:inherit;">Edit setup brand</button></div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="tabs">
+    <button class="tab on" id="tabPost" onclick="switchTab('Post')">✦ Generator Post</button>
+    <button class="tab" id="tabAnalytics" onclick="switchTab('Analytics')">📊 Analytics & Report</button>
+    <button class="tab" id="tabAI" onclick="switchTab('AI')">🤖 AI Generate</button>
+    <button class="tab" id="tabGuide" onclick="switchTab('Guide')">📖 Panduan</button>
+  </div>
+
+  <!-- GENERATOR TAB -->
+  <div class="pg on" id="pgPost">
+    <div id="phaseBadge"></div>
+    <div class="li-card">
+      <div class="li-top">
+        <div class="li-av" id="liAv">?</div>
+        <div><div class="li-nm" id="liNm">—</div><div class="li-hl" id="liHl">—</div><div style="font-size:.6rem;color:var(--txt4);margin-top:1px;">Baru saja · 🌐</div></div>
+      </div>
+      <div class="li-bd" id="liBody">Pilih hari dari sidebar, klik Tampilkan.</div>
+      <div class="li-ft"><div class="li-r">👍 Like</div><div class="li-r">💬 Comment</div><div class="li-r">🔁 Repost</div></div>
+    </div>
+    <div class="txt-box" style="max-width:580px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div class="txt-ttl" style="margin-bottom:0;">Teks Lengkap — Siap Copy-Paste</div>
+        <button id="editToggleBtn" onclick="toggleEdit()" style="padding:4px 12px;border-radius:6px;border:1px solid var(--border);background:none;color:var(--txt3);font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;cursor:pointer;transition:all .15s;">✏️ Edit</button>
+      </div>
+      <!-- Read mode -->
+      <div class="txt-body" id="postText">Post akan muncul setelah Tampilkan.</div>
+      <!-- Edit mode (hidden by default) -->
+      <textarea id="postEditArea" style="display:none;width:100%;min-height:280px;background:var(--inp);border:1px solid var(--accent);border-radius:8px;padding:10px 12px;color:var(--txt);font-family:'Plus Jakarta Sans',sans-serif;font-size:.78rem;line-height:1.8;outline:none;resize:vertical;" placeholder="Post akan muncul di sini untuk diedit..."></textarea>
+      <div id="editHint" style="display:none;font-size:.63rem;color:var(--accent);margin-top:6px;">✏️ Mode edit aktif — edit sesukamu, lalu klik Copy untuk copy versi yang sudah diedit.</div>
+    </div>
+    <div class="cta-box"><div class="cta-ttl">CTA</div><div class="cta-body" id="ctaText">—</div></div>
+    <div class="htag-box"><div class="htag-ttl">Hashtag</div><div class="htag-body" id="htagText">—</div></div>
+  </div>
+
+  <!-- ANALYTICS TAB -->
+  <div class="pg" id="pgAnalytics">
+    <div class="sum-grid">
+      <div class="sum-c"><div class="sum-n" id="stPosts">0</div><div class="sum-l">Posts Ditrack</div><div class="sum-s">dari 40 planned</div></div>
+      <div class="sum-c"><div class="sum-n" id="stImpr">0</div><div class="sum-l">Total Impressions</div></div>
+      <div class="sum-c"><div class="sum-n" id="stER">0%</div><div class="sum-l">Avg Engagement Rate</div></div>
+      <div class="sum-c"><div class="sum-n" id="stReact">0</div><div class="sum-l">Total Reactions</div></div>
+      <div class="sum-c"><div class="sum-n" id="stCom">0</div><div class="sum-l">Total Comments</div></div>
+      <div class="sum-c"><div class="sum-n" id="stDMs" style="color:var(--accent3);">0</div><div class="sum-l">Total DM Masuk</div></div>
+    </div>
+    <div class="inp-card">
+      <div class="inp-title">📥 Input Data Per Post</div>
+      <div class="inp-hint">Isi setelah tiap post dari LinkedIn Analytics, lalu klik Simpan</div>
+      <div class="inp-hdr">
+        <div class="inp-col" style="text-align:left;">Post</div>
+        <div class="inp-col">👁 Impr.</div><div class="inp-col">👍 React.</div><div class="inp-col">💬 Komen</div>
+        <div class="inp-col">🔁 Repost</div><div class="inp-col">🖱 Clicks</div><div class="inp-col">📩 DMs</div>
+      </div>
+      <div id="anlRows"></div>
+      <div class="btns-row">
+        <button class="save-btn" onclick="saveData()">💾 Simpan & Update Report</button>
+        <button class="clr-btn" onclick="clearData()">🗑 Reset</button>
+      </div>
+    </div>
+    <div class="ins-card" id="insCard" style="display:none;"><div class="ins-title">💡 Insights Otomatis</div><div id="insBody"></div></div>
+    <div class="chart-card">
+      <div class="chart-title">Grafik Performa per Post</div>
+      <div class="metric-tabs">
+        <button class="mt on" onclick="setM('impressions',this)">👁 Impr.</button>
+        <button class="mt" onclick="setM('reactions',this)">👍 React.</button>
+        <button class="mt" onclick="setM('comments',this)">💬 Komen</button>
+        <button class="mt" onclick="setM('reposts',this)">🔁 Repost</button>
+        <button class="mt" onclick="setM('clicks',this)">🖱 Clicks</button>
+        <button class="mt" onclick="setM('dms',this)">📩 DMs</button>
+        <button class="mt" onclick="setM('er',this)">📈 ER%</button>
+      </div>
+      <div class="chart-rows" id="chartRows"></div>
+    </div>
+    <div class="tbl-card">
+      <table class="atbl"><thead><tr>
+        <th>Post</th><th>👁 Impr.</th><th>👍 React.</th><th>💬 Komen</th>
+        <th>🔁 Repost</th><th>🖱 Clicks</th><th>📩 DMs</th><th>📈 ER%</th>
+      </tr></thead><tbody id="tblBody"></tbody></table>
+    </div>
+    <div class="top-card"><div class="top-title">🏆 Top 5 Post — by Engagement Rate</div><div id="topPosts"><div class="empty"><div class="empty-ic">📊</div><div class="empty-tx">Tambahkan data untuk melihat top posts.</div></div></div></div>
+  </div>
+
+  <!-- AI GENERATE TAB -->
+  <div class="pg" id="pgAI">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;max-width:640px;">
+      <div style="font-size:.6rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--accent2);opacity:.8;margin-bottom:4px;">🤖 AI Generate — via Claude.ai</div>
+      <div style="font-size:.72rem;color:var(--txt2);margin-bottom:14px;">Generate post baru dengan gaya brand kamu. Prompt otomatis terisi — tinggal klik Send di Claude.ai.</div>
+      <div style="margin-bottom:12px;"><label style="font-size:.6rem;font-weight:700;color:var(--txt4);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;">Tipe Post</label><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;" id="aiTypeGrid"></div></div>
+      <div style="margin-bottom:12px;"><label style="font-size:.6rem;font-weight:700;color:var(--txt4);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;">Angle <span style="color:var(--txt3);font-weight:400;text-transform:none;">(opsional)</span></label><input id="aiAngle" oninput="updatePrompt()" placeholder="Contoh: klien yang stuck di satu revenue level..." style="width:100%;background:var(--inp);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--txt);font-family:'Plus Jakarta Sans',sans-serif;font-size:.78rem;outline:none;"></div>
+      <div style="margin-bottom:14px;"><label style="font-size:.6rem;font-weight:700;color:var(--txt4);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;">Panjang</label><div style="display:flex;gap:5px;"><button class="ai-len" onclick="setLen('short',this)">Pendek</button><button class="ai-len on" onclick="setLen('medium',this)">Medium</button><button class="ai-len" onclick="setLen('long',this)">Panjang</button></div></div>
+      <button onclick="aiGen()" style="width:100%;padding:12px;border-radius:9px;border:none;background:linear-gradient(135deg,#166534,#16a34a);color:#fff;font-family:'Syne',sans-serif;font-size:.82rem;font-weight:900;cursor:pointer;">✦ Buka Claude.ai — Generate Sekarang</button>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;max-width:640px;">
+      <div style="font-size:.58rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--txt4);margin-bottom:8px;">🔍 Preview Prompt yang Akan Dikirim</div>
+      <div id="promptPrev" style="font-size:.7rem;color:var(--txt3);line-height:1.7;white-space:pre-wrap;max-height:200px;overflow-y:auto;font-family:'Space Mono',monospace;"></div>
+    </div>
+  </div>
+
+  <!-- PANDUAN TAB -->
+  <div class="pg" id="pgGuide" style="max-width:640px;">
+
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:20px 22px;margin-bottom:14px;">
+      <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:900;background:linear-gradient(135deg,var(--ba),var(--bb));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;">📖 Panduan Lengkap</div>
+      <div style="font-size:.78rem;color:var(--txt2);line-height:1.6;">Cara pakai LinkedIn Content Generator dari A sampai Z.</div>
+    </div>
+
+    <!-- Step 1 -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+        <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:900;color:var(--txt);">Setup Brand (Sekali Saja)</div>
+      </div>
+      <div style="font-size:.77rem;color:var(--txt2);line-height:1.85;">
+        Pertama kali buka app, isi <strong style="color:var(--txt);">Setup Wizard</strong> 6 langkah:<br><br>
+        <span style="color:var(--accent2);">①</span> <strong style="color:var(--txt);">Identitas</strong> — nama, inisial (2 huruf untuk avatar), headline LinkedIn<br>
+        <span style="color:var(--accent2);">②</span> <strong style="color:var(--txt);">Layanan</strong> — jenis bisnis, target klien, pain point, hasil yang kamu berikan<br>
+        <span style="color:var(--accent2);">③</span> <strong style="color:var(--txt);">Case Study</strong> — cerita klien nyata: sebelum → sesudah → hasil angka<br>
+        <span style="color:var(--accent2);">④</span> <strong style="color:var(--txt);">Harga</strong> — nama + harga + deskripsi untuk 2-3 paket<br>
+        <span style="color:var(--accent2);">⑤</span> <strong style="color:var(--txt);">CTA & Hashtag</strong> — contoh CTA: <code style="background:var(--bg2);padding:1px 6px;border-radius:4px;">DM "Free Audit"</code>, lalu 5-8 hashtag niche<br>
+        <span style="color:var(--accent2);">⑥</span> <strong style="color:var(--txt);">Tone</strong> — pilih Mix Indo-English (paling recommended)<br><br>
+        Klik <strong style="color:var(--accent2);">Setup Selesai</strong> → 40 post langsung pakai brand kamu. Data tersimpan otomatis.
+      </div>
+      <div style="margin-top:10px;padding:10px 12px;background:var(--bg2);border-radius:8px;font-size:.71rem;color:var(--txt3);">💡 Mau edit setup? Klik <em>"Edit setup brand"</em> di sidebar kiri bawah kapan saja.</div>
+    </div>
+
+    <!-- Step 2 -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#a78bfa;color:#fff;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+        <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:900;color:var(--txt);">Generate & Copy Post Harian</div>
+      </div>
+      <div style="font-size:.77rem;color:var(--txt2);line-height:1.85;">
+        <span style="color:var(--accent);">→</span> Pilih hari di sidebar kiri (Day 1–40)<br>
+        <span style="color:var(--accent);">→</span> Klik <strong style="color:var(--accent2);">Tampilkan Post</strong><br>
+        <span style="color:var(--accent);">→</span> Klik <strong style="color:var(--accent2);">Copy Post + Hashtag</strong> → paste ke LinkedIn<br><br>
+        <strong style="color:var(--txt);">Struktur 40 post:</strong><br>
+        <span style="color:#5865f2;">● Day 1-7</span> Foundation — kenalkan diri &amp; positioning<br>
+        <span style="color:#a78bfa;">● Day 8-14</span> Education — edukasi masalah klien<br>
+        <span style="color:#57f287;">● Day 15-20</span> Conversion — case study &amp; closing<br>
+        <span style="color:#fb923c;">● Day 21-27</span> Scale — insight &amp; authority lanjutan<br>
+        <span style="color:#22d3ee;">● Day 28-34</span> Authority — bangun kepercayaan<br>
+        <span style="color:#f472b6;">● Day 35-40</span> Closing 2.0 — final push &amp; CTA kuat
+      </div>
+      <div style="margin-top:10px;padding:10px 12px;background:var(--bg2);border-radius:8px;font-size:.71rem;color:var(--txt3);">💡 Setelah Day 40 habis — ulangi dari Day 1, atau gunakan AI Generate untuk variasi baru.</div>
+    </div>
+
+    <!-- Step 3 -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#57f287;color:#000;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+        <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:900;color:var(--txt);">Tone Bahasa</div>
+      </div>
+      <div style="font-size:.77rem;color:var(--txt2);line-height:1.85;">
+        <strong style="color:var(--txt);">🔀 Mix Indo-English</strong> — Paling recommended. Gaya natural, paling engage.<br>
+        <strong style="color:var(--txt);">🇬🇧 Full English</strong> — Untuk audience internasional. Hasil = draft, edit manual untuk lebih natural.<br>
+        <strong style="color:var(--txt);">🇮🇩 Full Bahasa</strong> — Untuk audience 100% Indonesia. Sama, cek dan edit hasilnya.<br>
+        <strong style="color:var(--txt);">✂️ Pendek</strong> — Potong post ~150 kata. Cocok untuk konten singkat.
+      </div>
+      <div style="margin-top:10px;padding:10px 12px;background:var(--bg2);border-radius:8px;font-size:.71rem;color:var(--txt3);">💡 Untuk translate yang benar-benar natural, gunakan AI Generate dan tulis instruksi tone di kolom Angle.</div>
+    </div>
+
+    <!-- Step 4 -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#fb923c;color:#fff;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
+        <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:900;color:var(--txt);">AI Generate — Post Tak Terbatas</div>
+      </div>
+      <div style="font-size:.77rem;color:var(--txt2);line-height:1.85;">
+        <span style="color:var(--accent);">→</span> Buka tab <strong style="color:var(--accent2);">🤖 AI Generate</strong><br>
+        <span style="color:var(--accent);">→</span> Pilih tipe post (Hook, Story, Framework, dll)<br>
+        <span style="color:var(--accent);">→</span> Isi <strong style="color:var(--txt);">Angle</strong> — makin spesifik, makin bagus hasilnya<br>
+        <span style="color:var(--accent);">→</span> Klik <strong style="color:var(--accent2);">Buka Claude.ai</strong> → klik Send → copy hasilnya<br><br>
+        <strong style="color:var(--txt);">Contoh angle yang bagus:</strong><br>
+        <code style="background:var(--bg2);padding:2px 8px;border-radius:4px;font-size:.7rem;display:block;margin:3px 0;">"founder yang baru rekrut tim tapi makin overwhelmed"</code>
+        <code style="background:var(--bg2);padding:2px 8px;border-radius:4px;font-size:.7rem;display:block;margin:3px 0;">"bisnis 3 tahun tapi revenue masih stagnan"</code>
+        <code style="background:var(--bg2);padding:2px 8px;border-radius:4px;font-size:.7rem;display:block;margin:3px 0;">"full English version untuk audience luar negeri"</code>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#22d3ee;color:#000;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">5</div>
+        <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:900;color:var(--txt);">Analytics & Report</div>
+      </div>
+      <div style="font-size:.77rem;color:var(--txt2);line-height:1.85;">
+        <span style="color:var(--accent);">→</span> Setelah posting, buka LinkedIn Analytics (klik ikon grafik di post)<br>
+        <span style="color:var(--accent);">→</span> Catat: Impressions, Reactions, Comments, Reposts, Clicks, DMs<br>
+        <span style="color:var(--accent);">→</span> Buka tab <strong style="color:var(--accent2);">📊 Analytics</strong>, isi angka di baris yang sesuai<br>
+        <span style="color:var(--accent);">→</span> Klik <strong style="color:var(--accent2);">Simpan & Update Report</strong><br><br>
+        Setelah 3+ post diisi → muncul <strong style="color:var(--accent2);">💡 Insights Otomatis</strong> berisi rekomendasi berdasarkan data kamu.
+      </div>
+      <div style="margin-top:10px;padding:10px 12px;background:var(--bg2);border-radius:8px;font-size:.71rem;color:var(--txt3);">💡 Data tersimpan di browser — tidak hilang kalau ditutup. Kalau ganti perangkat, isi ulang datanya.</div>
+    </div>
+
+    <!-- Tips -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:20px;">
+      <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:900;color:var(--txt);margin-bottom:12px;">⚡ Tips Posting LinkedIn</div>
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:var(--accent2);flex-shrink:0;">⏰</span><span style="font-size:.76rem;color:var(--txt2);">Post jam <strong style="color:var(--txt);">8-9 pagi</strong> atau <strong style="color:var(--txt);">5-6 sore</strong> — saat founder aktif di LinkedIn</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:var(--accent2);flex-shrink:0;">💬</span><span style="font-size:.76rem;color:var(--txt2);">Balas komentar dalam <strong style="color:var(--txt);">2 jam pertama</strong> — algoritma LinkedIn sangat boost ini</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:var(--accent2);flex-shrink:0;">📌</span><span style="font-size:.76rem;color:var(--txt2);">Pin post engagement tertinggi ke profil — kesan pertama dari calon klien baru</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:var(--accent2);flex-shrink:0;">📩</span><span style="font-size:.76rem;color:var(--txt2);">Kirim <strong style="color:var(--txt);">5 DM cold outreach</strong> setelah tiap post — jangan tunggu mereka datang</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:var(--accent2);flex-shrink:0;">🔁</span><span style="font-size:.76rem;color:var(--txt2);">Setelah Day 40 — ulangi top 5 post terbaik dengan variasi angle yang berbeda</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:var(--accent2);flex-shrink:0;">📊</span><span style="font-size:.76rem;color:var(--txt2);">Isi analytics tiap minggu — lihat tipe konten yang paling banyak generate DMs</span></div>
+      </div>
+    </div>
+
+  </div><!-- pgGuide end -->
+</div>
+</div>
+<div class="toast" id="T"></div>
+
+<script>
+// POST TEMPLATES with {placeholders}
+const PT=[
+  {day:1,ph:1,type:"Hook",title:"The Hook",color:"#5865f2",text:`{target} lagi growing. Tapi malah makin overwhelmed.
+
+{pain}
+
+Sound familiar?
+
+Masalahnya bukan kamu. Masalahnya approach yang belum tepat.
+
+I help {target} solve this — dengan {svc_short}.
+
+Interested? {cta} 📩`},
+  {day:2,ph:1,type:"Agitation",title:"5 Tanda Masalah",color:"#5865f2",text:`Ini yang happen ketika {target} nggak punya sistem yang tepat:
+
+❌ Stuck di level yang sama berbulan-bulan
+❌ Effort besar tapi result nggak sebanding
+❌ Nggak tau mana yang harus difokuskan
+❌ Keputusan berdasarkan feeling, bukan data
+❌ Growth terasa berat dan lambat
+
+Paling ironis: makin keras kerja, makin stuck rasanya.
+
+Problemnya bukan effort kamu. Ini soal {svc_short}.
+
+Sound like you?`},
+  {day:3,ph:1,type:"Insight",title:"Reframe",color:"#5865f2",text:`Kebanyakan {target} fokus ke hal yang salah.
+
+Mereka pikir: "Kalau aku kerja lebih keras, hasilnya pasti lebih besar."
+
+Realitasnya? Yang membedakan yang stuck vs yang scaling bukan effort.
+
+Ini soal:
+🎯 Clarity — tau persis apa yang mau dicapai
+📊 Strategy — approach yang tepat
+⚡ Execution — action yang benar di urutan yang benar
+🔄 Iteration — belajar cepat dari setiap langkah
+
+I help {target} build this. Curious? More coming 👇`},
+  {day:4,ph:1,type:"Social Proof",title:"Case Study 1",color:"#5865f2",text:`Client case study:
+
+{case1}
+
+Ini yang saya help {target} achieve.
+
+Want similar results? {cta} 📩`},
+  {day:5,ph:1,type:"Framework",title:"Why It Works",color:"#5865f2",text:`Kenapa {svc_short} works untuk {target}:
+
+1️⃣ CLARITY
+Tau persis problem utamanya dan solusinya.
+
+2️⃣ STRATEGY
+Roadmap yang jelas — bukan coba-coba.
+
+3️⃣ ACCOUNTABILITY
+Sistem untuk track progress dan adjust.
+
+4️⃣ RESULTS
+{result_s}
+
+Bukan magic. Ini sistematis.
+
+Dan itulah dimana I come in.`},
+  {day:6,ph:1,type:"Story",title:"Founder Story",color:"#5865f2",text:`Saya pernah ada di posisi yang sama seperti klien saya.
+
+Frustrasi karena:
+❌ Udah effort maksimal tapi result nggak kunjung datang
+❌ Nggak tau harus mulai dari mana
+❌ Feeling stuck padahal udah kerja keras
+
+Lalu saya discovered bahwa masalahnya bukan pada effort.
+Masalahnya pada approach.
+
+Sekarang saya help {target} avoid the same mistakes.
+
+Kamu relate dengan ini?`},
+  {day:7,ph:1,type:"Objection",title:"Common Objection",color:"#5865f2",text:`Common objection yang sering saya dengar:
+
+"Saya nggak butuh {svc_short} — saya bisa figuring out sendiri."
+
+Maybe.
+
+Tapi consider this:
+❌ Trial and error sendiri = buang waktu & uang
+❌ Nggak ada outside perspective = blind spots
+❌ Learning dari mistakes sendiri = mahal
+
+Vs:
+✅ Proven framework yang sudah terbukti
+✅ Avoid costly mistakes
+✅ Hasil lebih cepat
+
+{cta} jika mau explore lebih lanjut. 📩`},
+  {day:8,ph:2,type:"Framework",title:"3 Pillars",color:"#a78bfa",text:`{target} yang struggle biasanya missing 3 hal:
+
+1️⃣ CLARITY
+Nggak tau persis masalah utamanya apa
+
+2️⃣ STRATEGY
+Nggak ada roadmap yang jelas
+
+3️⃣ EXECUTION
+Action yang salah di urutan yang salah
+
+Pas 1 pillar ini missing, everything feels hard.
+
+Dengan {svc_short}:
+✅ CLARITY: Identify masalah sebenarnya
+✅ STRATEGY: Roadmap yang proven
+✅ EXECUTION: Step by step yang benar
+
+Ini foundation dari growth yang sustainable.`},
+  {day:9,ph:2,type:"Cost Analysis",title:"Cost of Not Acting",color:"#a78bfa",text:`Berapa harga dari "nggak ngapa-ngapain"?
+
+Mari hitung:
+⏱️ Waktu yang di-waste karena approach yang salah
+💰 Opportunity yang missed karena stuck
+😤 Frustrasi dan energi yang habis
+📉 Revenue yang harusnya bisa lebih tinggi
+
+Total cost-nya? Jauh lebih besar dari investasi untuk {svc_short}.
+
+{t1n}: {t1p}.
+
+ROI? Balik modal dari pertama kali kamu dapat hasil yang berbeda.
+
+Math-nya jelas.`},
+  {day:10,ph:2,type:"Before/After",title:"Before vs After",color:"#a78bfa",text:`BEFORE bekerja sama:
+❌ Stuck di masalah yang sama
+❌ Nggak tau langkah selanjutnya
+❌ Effort besar, result kecil
+❌ Overwhelmed dan frustrated
+
+AFTER bekerja sama:
+✅ Clarity tentang apa yang harus dilakukan
+✅ Roadmap yang jelas step by step
+✅ Effort yang tepat sasaran
+✅ Progress yang terlihat dan terukur
+
+Same person. Same goal.
+
+Different approach = different results.
+
+What would change untuk kamu?`},
+  {day:11,ph:2,type:"Education",title:"Hidden Costs",color:"#a78bfa",text:`Yang sering di-underestimate oleh {target}:
+
+Cost of staying stuck:
+💸 Revenue yang harusnya bisa lebih tinggi
+⏰ Waktu yang terbuang karena trial & error
+😰 Mental energy dari stress dan frustrasi
+
+Vs investasi untuk {svc_short}:
+{t1n}: {t1p}
+{t2n}: {t2p}{t3l}
+
+Dua angka yang tidak sebanding kalau dipikir long-term.
+
+Kamu sudah berapa lama stuck?`},
+  {day:12,ph:2,type:"Walkthrough",title:"How I Work",color:"#a78bfa",text:`Ini gimana saya work dengan {target}:
+
+TAHAP 1: DIAGNOSIS
+🔍 Identify masalah utama
+📊 Audit situasi saat ini
+🎯 Set target yang clear
+
+TAHAP 2: STRATEGY
+📋 Build roadmap yang spesifik
+⚡ Prioritize action yang highest impact
+📐 Define success metrics
+
+TAHAP 3: EXECUTION
+✅ Implement step by step
+🔄 Track progress
+📈 Iterate berdasarkan data
+
+Bukan one-size-fits-all. Custom untuk situasi kamu.
+
+{cta} 📩`},
+  {day:13,ph:2,type:"Mistakes",title:"Common Mistakes",color:"#a78bfa",text:`Mistakes yang sering saya lihat dari {target}:
+
+1️⃣ FOKUS KE TAKTIK, BUKAN STRATEGI
+Coba ini, coba itu — tanpa arah yang jelas
+
+2️⃣ SKIP DIAGNOSIS
+Langsung action tanpa understand masalah sebenarnya
+
+3️⃣ NO ACCOUNTABILITY
+Mulai strong, lalu fades away
+
+4️⃣ WRONG METRICS
+Measure hal yang salah = keputusan yang salah
+
+5️⃣ ISOLATED THINKING
+Nggak ada outside perspective = blind spots
+
+Ini yang sering terjadi tanpa guidance yang tepat.
+
+This is exactly what {svc_short} solves.`},
+  {day:14,ph:2,type:"Mindset",title:"The Right Mindset",color:"#a78bfa",text:`Most {target} think: "Kalau saya kerja lebih keras, hasilnya pasti datang."
+
+Wrong frame.
+
+Yang scaling faster adalah yang work smarter:
+
+Work harder ≠ better results
+Right approach = better results
+
+The {target} yang grow consistently:
+✅ Invest in the right guidance
+✅ Follow proven systems
+✅ Measure and iterate fast
+
+Kamu di crossroads:
+
+Choice A: Keep doing the same thing
+❌ Same results
+❌ More frustration
+
+Choice B: Get the right support
+✅ Faster progress
+✅ Better results
+
+Which are you choosing?`},
+  {day:15,ph:3,type:"Case Study",title:"Full Case Study 1",color:"#57f287",text:`CLIENT STORY:
+
+{case1}
+
+This is what I do for {target}.
+
+Want similar results?
+{cta} for a free 30-min assessment. 📩`},
+  {day:16,ph:3,type:"Case Study",title:"Full Case Study 2",color:"#57f287",text:`{case2p}
+
+{cta} — mari chat. 📩`},
+  {day:17,ph:3,type:"Objection",title:"Addressing Skepticism",color:"#57f287",text:`Sering dapat pertanyaan: "Apa bedanya kamu dengan yang lain?"
+
+Jujur jawaban saya:
+
+Bukan soal siapa yang paling bagus.
+Ini soal fit yang tepat.
+
+Saya work best dengan {target} yang:
+✅ Sudah tau ada masalah yang perlu di-solve
+✅ Ready untuk invest dalam prosesnya
+✅ Committed untuk follow through
+✅ Open to honest feedback
+
+Kalau itu bukan kamu — no worries.
+Kalau itu kamu — let's talk.
+
+{cta} 📩`},
+  {day:18,ph:3,type:"ROI",title:"Investment Breakdown",color:"#57f287",text:`Let's talk numbers:
+
+INVESTASI:
+{t1n}: {t1p}
+{t2n}: {t2p}{t3l}
+
+WHAT YOU GET:
+{result}
+
+ROI:
+💰 Revenue potential yang unlocked
+⏰ Waktu yang di-save dari trial & error
+🎯 Decisions yang lebih confident
+📈 Progress yang lebih cepat
+
+This isn't a cost.
+This is an investment dengan clear return.
+
+Ready? {cta} 📩`},
+  {day:19,ph:3,type:"Qualification",title:"Who This Is For",color:"#57f287",text:`I work dengan {target} yang:
+
+✅ Serius tentang growth mereka
+✅ Ready to invest (waktu dan resources)
+✅ Mau follow proven system
+✅ Open to outside perspective
+✅ Committed to action, bukan cuma planning
+
+I don't work dengan yang:
+
+❌ Cari quick fix tanpa effort
+❌ Nggak ready untuk change approach
+❌ Expect hasil tanpa proses
+
+Kalau kamu fit the first list — {cta} 📩`},
+  {day:20,ph:3,type:"Final CTA",title:"Close Hard",color:"#57f287",text:`Kamu udah lihat framework, case studies, numbers.
+
+Here's real talk:
+
+CHOICE A: Keep doing the same thing
+❌ Same results
+❌ More time wasted
+
+CHOICE B: Get the right support now
+✅ Faster progress
+✅ Clearer path forward
+
+One leads to frustration.
+One leads to growth.
+
+Which are you choosing?
+
+If B — {cta}
+
+30 minutes. No pressure. No hard sell.
+Just clarity about what's possible.
+
+Let's go 💪`},
+  {day:21,ph:4,type:"Hook",title:"Scaling Trap",color:"#fb923c",text:`Most {target} make this mistake:
+
+Problem muncul → tambah resource → masalah makin kompleks.
+
+Bukan karena resource-nya kurang.
+Karena sistem-nya belum siap untuk scale.
+
+Build the right system first.
+Then add the resource.
+
+Kamu scaling problem atau scaling potential? {cta} 📩`},
+  {day:22,ph:4,type:"Education",title:"Why Some Fail",color:"#fb923c",text:`Kenapa {target} yang sama bisa dapat hasil yang sangat berbeda?
+
+Bukan soal:
+❌ Seberapa keras mereka kerja
+❌ Seberapa besar budget mereka
+
+Ini soal:
+✅ Seberapa tepat strategy mereka
+✅ Seberapa jelas execution plan-nya
+✅ Seberapa cepat mereka belajar dan iterate
+
+Difference? {svc_short}.
+
+Still doing it the hard way? {cta} 📩`},
+  {day:23,ph:4,type:"Story",title:"Client Story",color:"#fb923c",text:`{case1}
+
+Itu bukan kebetulan.
+Itu hasil dari sistem yang tepat.
+
+System yang right = results yang right. {cta} 📩`},
+  {day:24,ph:4,type:"Insight",title:"Real Cost",color:"#fb923c",text:`The most expensive thing untuk {target} bukan investment yang besar.
+
+Itu adalah kesempatan yang missed karena nggak bergerak cukup cepat.
+
+Every month kamu stuck:
+→ Competitors terus bergerak
+→ Market window bisa menutup
+→ Momentum yang hilang susah balik
+
+Investasi {svc_short}? Fraction dari cost of staying stuck.
+
+You're already paying for the problem.
+Might as well invest in the solution. {cta} 📩`},
+  {day:25,ph:4,type:"Framework",title:"5-Layer Framework",color:"#fb923c",text:`Framework yang I use dengan {target}:
+
+LAYER 1: DIAGNOSIS
+Understand situasi sebenarnya — bukan asumsi.
+
+LAYER 2: STRATEGY
+Roadmap yang spesifik untuk situasi kamu.
+
+LAYER 3: EXECUTION
+Action yang tepat di urutan yang tepat.
+
+LAYER 4: MEASUREMENT
+Track yang penting, ignore yang noise.
+
+LAYER 5: ITERATION
+Learn fast, adjust faster.
+
+5 layers. Satu sistem. Hasil yang konsisten. {cta} 📩`},
+  {day:26,ph:4,type:"Objection",title:"But My Case Is Different",color:"#fb923c",text:`"Tapi situasi saya berbeda."
+
+Saya dengar ini sering.
+
+Dan technically, setiap situasi memang unik.
+
+Tapi core challenges untuk {target}? Surprisingly similar:
+❌ Clarity tentang next step
+❌ Strategy yang proven
+❌ Accountability dan support
+
+Yang saya bring ke table adalah framework yang flex untuk situasi spesifik kamu.
+
+Bukan one-size-fits-all. Custom untuk context kamu.
+
+Sound more relevant? {cta} 📩`},
+  {day:27,ph:4,type:"Engagement",title:"Poll",color:"#fb923c",text:`Quick question untuk {target} di LinkedIn:
+
+Apa challenge terbesar kamu sekarang?
+
+A) Clarity — nggak tau harus mulai dari mana
+B) Strategy — punya ide tapi nggak tau caranya
+C) Execution — tau caranya tapi susah konsisten
+D) Results — udah action tapi hasilnya belum sesuai
+
+Drop answer di komentar 👇
+
+Genuinely curious — jawaban kamu bantu saya understand better.`},
+  {day:28,ph:5,type:"Authority",title:"What I See Working",color:"#22d3ee",text:`After working dengan berbagai {target}, ini yang consistently works:
+
+1. INVEST IN CLARITY FIRST
+Tau persis masalahnya sebelum solve it.
+
+2. BUILD SYSTEMS, NOT ONE-OFF SOLUTIONS
+Yang sustainable beats yang quick fix.
+
+3. MEASURE WHAT MATTERS
+Ignore vanity metrics. Focus pada yang move the needle.
+
+Kamu di camp mana sekarang? {cta} 📩`},
+  {day:29,ph:5,type:"Education",title:"Speed Advantage",color:"#22d3ee",text:`The real competitive advantage untuk {target}:
+
+Bukan budget yang lebih besar.
+Bukan tim yang lebih besar.
+
+Ini soal speed of learning.
+
+Yang iterate lebih cepat:
+→ Temukan yang works lebih awal
+→ Cut losses lebih cepat
+→ Compound advantage over time
+
+Dengan {svc_short}:
+→ Shortcut learning curve
+→ Avoid costly mistakes
+→ Accelerate your timeline
+
+Kamu mau iterate sendirian atau dengan guidance? {cta} 📩`},
+  {day:30,ph:5,type:"Story",title:"The Turning Point",color:"#22d3ee",text:`Moment yang changed how I think:
+
+Waktu itu saya realized bahwa {target} yang struggling dan yang thriving seringkali punya resources yang sama.
+
+Bedanya?
+Yang thriving punya sistem.
+Yang struggling masih rely on hustle.
+
+Systems scale.
+Hustle burns out.
+
+Itu kenapa saya dedicate diri untuk help {target} build the right systems.
+
+What system would change things untuk kamu? {cta} 📩`},
+  {day:31,ph:5,type:"Framework",title:"Decision Quality",color:"#22d3ee",text:`One of the most underrated skills untuk {target}:
+
+Decision quality.
+
+Most decisions dibuat berdasarkan:
+❌ Feelings
+❌ What others are doing
+❌ What worked before
+
+Decisions yang harusnya berdasarkan:
+✅ Clear data dan metrics
+✅ Aligned dengan goals
+✅ Understanding of trade-offs
+
+Better decisions = better results.
+
+Are your decisions systematic? {cta} 📩`},
+  {day:32,ph:5,type:"Social Proof",title:"Client Win",color:"#22d3ee",text:`Feedback dari klien:
+
+"{result}"
+
+That's the goal.
+
+Bukan dependency.
+Tapi capability yang tersisa setelah kita selesai bekerja sama.
+
+Apakah kamu punya sistem yang bisa run without you constantly firefighting?
+
+{cta} 📩`},
+  {day:33,ph:5,type:"Insight",title:"Long Game",color:"#22d3ee",text:`Hot take: {target} yang invest dalam jangka panjang outperform yang fokus quick wins.
+
+Bukan soal slow vs fast.
+Soal sustainable vs unsustainable.
+
+Quick win mentality:
+⚡ Fast results upfront
+📉 Often unsustainable
+
+Long game mentality:
+🏗 Build right foundation
+📈 Compound results over time
+
+Dengan {svc_short}:
+Kamu build untuk jangka panjang.
+Bukan patch untuk short term. {cta} 📩`},
+  {day:34,ph:5,type:"Education",title:"Knowledge Compounds",color:"#22d3ee",text:`The best investment untuk {target}:
+
+Bukan tools.
+Bukan ads.
+Bukan hire tambahan.
+
+Ini adalah right knowledge dan framework.
+
+Kenapa?
+
+Tools obsolete. Ads butuh constant spend.
+Framework yang tepat? Stays with you forever. Compounds over time.
+
+Itu yang saya provide dengan {svc_short}.
+
+Kamu invest di yang mana? {cta} 📩`},
+  {day:35,ph:6,type:"Closing",title:"The Real Question",color:"#f472b6",text:`Let me ask kamu something direct:
+
+Right now — do you know:
+
+1. Apa 3 hal terpenting yang harus kamu focus bulan ini?
+2. Apa yang blocking kamu dari next level?
+3. Apa yang harus berubah untuk get different results?
+
+Kalau kamu had to think lebih dari 5 detik — itu ada sesuatu yang perlu di-address.
+
+Clarity tentang hal-hal ini? Itu yang saya build dengan klien saya.
+
+Ready? {cta} 📩`},
+  {day:36,ph:6,type:"Urgency",title:"Cost of Waiting",color:"#f472b6",text:`Every month you wait:
+
+💸 Opportunity yang missed
+⏰ Waktu yang nggak bisa dikembalikan
+📉 Gap dengan competitors yang terus melebar
+
+Investasi {svc_short}? {t2p} untuk {t2n}.
+
+Cost of waiting 6 months? Jauh lebih dari itu.
+
+Math-nya clear.
+
+The only question: what's holding you back?
+
+Drop di komentar. I'll address it directly. {cta} 📩`},
+  {day:37,ph:6,type:"Social Proof",title:"What Clients Say",color:"#f472b6",text:`Pattern yang saya lihat setelah bekerja sama:
+
+"Akhirnya ada clarity."
+
+Bukan karena saya kasih magic formula.
+
+Tapi karena:
+✅ Ada framework yang jelas
+✅ Ada accountability
+✅ Ada outside perspective
+✅ Ada proven path
+
+Yang tadinya overwhelming jadi manageable.
+Yang tadinya stuck jadi moving.
+
+Kalau kamu masih ngerasa overwhelmed — itu tanda.
+
+{cta} 📩`},
+  {day:38,ph:6,type:"Qualification",title:"Who Gets Results",color:"#f472b6",text:`{target} yang get the most dari working together:
+
+✅ Experiencing pain point-nya RIGHT NOW
+✅ Open to changing their approach
+✅ Willing to invest waktu selama proses
+✅ See ini sebagai long-term investment
+✅ Action-oriented, bukan planning-oriented
+
+Yang nggak get results:
+❌ Expect instant fix tanpa proses
+❌ Nggak mau change cara kerja
+❌ Looking for someone to do everything
+
+The work is collaborative.
+Saya bring framework. Kamu bring commitment.
+
+Fit? {cta} 📩`},
+  {day:39,ph:6,type:"Final Push",title:"90 Days From Now",color:"#f472b6",text:`90 hari dari sekarang:
+
+SCENARIO A (tanpa perubahan):
+→ Masalah yang sama masih ada
+→ Masih stuck di level yang sama
+→ Lebih banyak waktu dan energy habis
+
+SCENARIO B (dengan {svc_short}):
+→ Clarity tentang apa yang harus dilakukan
+→ Progress yang terlihat dan terukur
+→ {result_s}
+
+Same 90 hari. Very different outcome.
+
+Scenario B dimulai dengan 30-minute conversation.
+
+{cta} sekarang. 📩`},
+  {day:40,ph:6,type:"Final CTA",title:"Last Call",color:"#f472b6",text:`40 posts. Framework, stories, case studies, numbers.
+
+Kalau kamu masih di sini — kamu serius tentang growth kamu.
+
+Satu hal yang I know:
+
+Yang invest dalam right guidance, progress lebih cepat.
+Yang nggak, struggle lebih lama.
+
+Satu langkah tersisa:
+
+{cta}
+
+Free 30 minutes.
+No pitch. No hard sell.
+Just clarity tentang apa yang possible.
+
+Ready? Let's go. 🚀`},
+];
+
+const TONES=[{id:"mix",i:"🔀",n:"Mix",s:"Indo-English"},{id:"en",i:"🇬🇧",n:"English",s:"Full English"},{id:"id",i:"🇮🇩",n:"Bahasa",s:"Full Indonesia"},{id:"short",i:"✂️",n:"Pendek",s:"Max ~150 kata"}];
+const METRICS=["impressions","reactions","comments","reposts","clicks","dms"];
+const MC={impressions:"#5865f2",reactions:"#57f287",comments:"#fbbf24",reposts:"#f472b6",clicks:"#22d3ee",dms:"#a78bfa",er:"#fb923c"};
+const PHC={1:"#5865f2",2:"#a78bfa",3:"#57f287",4:"#fb923c",5:"#22d3ee",6:"#f472b6"};
+const PHN={1:"Phase 1 — Foundation",2:"Phase 2 — Education",3:"Phase 3 — Conversion",4:"Phase 4 — Scale",5:"Phase 5 — Authority",6:"Phase 6 — Closing 2.0"};
+const AI_TYPES=[{id:"hook",e:"🎣",l:"Hook",s:"Pain point opener"},{id:"story",e:"📖",l:"Story",s:"Personal narrative"},{id:"framework",e:"🔧",l:"Framework",s:"Numbered insights"},{id:"casestudy",e:"📊",l:"Case Study",s:"Problem→Result"},{id:"education",e:"📚",l:"Edukasi",s:"Teach something"},{id:"objection",e:"💭",l:"Objection",s:"Handle skepticism"},{id:"roi",e:"💰",l:"ROI",s:"Numbers & math"},{id:"closing",e:"🔥",l:"Closing",s:"Drive action"}];
+
+let U={},selDay=1,selTone="mix",selMetric="impressions",anlData={},aiType="hook",aiLen="medium",wzTone="mix";
+
+// WIZARD
+function setWTone(t,el){
+  wzTone=t;
+  document.querySelectorAll(".wz-tb").forEach(b=>b.classList.remove("on"));
+  el.classList.add("on");
+}
+
+function gv(id){return document.getElementById(id)?.value?.trim()||"";}
+
+function finishSetup(){
+  const req=[["w-name","Nama"],["w-headline","Headline"],["w-service","Layanan"],["w-target","Target Klien"],["w-pain","Pain Point"],["w-result","Hasil"],["w-case1","Case Study 1"],["w-t1n","Nama Paket 1"],["w-t1p","Harga Paket 1"],["w-t2n","Nama Paket 2"],["w-t2p","Harga Paket 2"],["w-cta","CTA"],["w-dm","Keyword DM"],["w-ht","Hashtag"]];
+  for(const [id,lbl] of req){if(!gv(id)){toast("⚠️ "+lbl+" wajib diisi!");document.getElementById(id)?.focus();return;}}
+  const t3=document.getElementById("w-t3on")?.checked&&gv("w-t3n");
+  const svc=gv("w-service");
+  const svcS=svc.split(/[.,]/)[0];
+  const res=gv("w-result");
+  const resS=res.split(/[→,]/)[res.includes("→")?res.split("→").length-1:0].trim();
+  const cs2=gv("w-case2");
+  U={
+    name:gv("w-name"),init:gv("w-init")||(gv("w-name").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase()),
+    headline:gv("w-headline"),service:svc,svc_short:svcS,
+    target:gv("w-target"),pain:gv("w-pain"),result:res,result_s:resS,
+    case1:gv("w-case1"),case2:cs2,
+    case2p:cs2?("CLIENT STORY:\n\n"+cs2+"\n\n"+gv("w-name")+" help "+gv("w-target")+" achieve this."):(gv("w-case1")+"\n\nIni bukan kebetulan. Ini hasil dari sistem yang tepat."),
+    t1n:gv("w-t1n"),t1p:gv("w-t1p"),t1d:gv("w-t1d"),
+    t2n:gv("w-t2n"),t2p:gv("w-t2p"),t2d:gv("w-t2d"),
+    t3on:t3,t3n:t3?gv("w-t3n"):"",t3p:t3?gv("w-t3p"):"",
+    t3l:t3?("\n"+gv("w-t3n")+": "+gv("w-t3p")):"",
+    cta:gv("w-cta"),dm:gv("w-dm"),hashtags:gv("w-ht"),tone:wzTone,
+  };
+  localStorage.setItem("li_cfg",JSON.stringify(U));
+  document.getElementById("setupOverlay").style.display="none";
+  document.getElementById("mainApp").style.display="grid";
+  selTone=U.tone;
+  initApp();
+  toast("✅ Setup selesai! App siap digunakan.");
+}
+
+function showSetup(){document.getElementById("setupOverlay").style.display="flex";document.getElementById("mainApp").style.display="none";}
+function resetApp(){if(!confirm("Reset semua data?"))return;localStorage.removeItem("li_cfg");localStorage.removeItem("li_anl2");location.reload();}
+
+// FILL PLACEHOLDERS
+function fill(txt){
+  if(!U.name)return txt;
+  return txt.replace(/{target}/g,U.target).replace(/{pain}/g,U.pain).replace(/{svc_short}/g,U.svc_short)
+    .replace(/{result}/g,U.result).replace(/{result_s}/g,U.result_s)
+    .replace(/{case1}/g,U.case1).replace(/{case2p}/g,U.case2p)
+    .replace(/{t1n}/g,U.t1n).replace(/{t1p}/g,U.t1p)
+    .replace(/{t2n}/g,U.t2n).replace(/{t2p}/g,U.t2p)
+    .replace(/{t3l}/g,U.t3l).replace(/{cta}/g,U.cta).replace(/{dm}/g,U.dm);
+}
+
+function applyTone(txt){
+  if(selTone==="en"){
+    return txt
+      .replace(/nggak/g,"don't").replace(/Nggak/g,"Don't")
+      .replace(/kamu/g,"you").replace(/Kamu/g,"You")
+      .replace(/untuk/g,"for").replace(/Untuk/g,"For")
+      .replace(/dengan/g,"with").replace(/Dengan/g,"With")
+      .replace(/sekarang/g,"now").replace(/Sekarang/g,"Now")
+      .replace(/saya/g,"I").replace(/Saya/g,"I")
+      .replace(/ini/g,"this").replace(/Ini/g,"This")
+      .replace(/yang/g,"that").replace(/Yang/g,"That")
+      .replace(/atau/g,"or").replace(/Atau/g,"Or")
+      .replace(/tapi/g,"but").replace(/Tapi/g,"But")
+      .replace(/juga/g,"also").replace(/Juga/g,"Also")
+      .replace(/sudah/g,"already").replace(/Sudah/g,"Already")
+      .replace(/bisa/g,"can").replace(/Bisa/g,"Can")
+      .replace(/lebih/g,"more").replace(/Lebih/g,"More")
+      .replace(/sangat/g,"very").replace(/Sangat/g,"Very")
+      .replace(/semua/g,"all").replace(/Semua/g,"All")
+      .replace(/sering/g,"often").replace(/Sering/g,"Often")
+      .replace(/masih/g,"still").replace(/Masih/g,"Still")
+      .replace(/harus/g,"must").replace(/Harus/g,"Must")
+      .replace(/mau/g,"want").replace(/Mau/g,"Want")
+      .replace(/mari/g,"let's").replace(/Mari/g,"Let's")
+      .replace(/gimana/g,"how").replace(/Gimana/g,"How")
+      .replace(/banget/g,"really").replace(/Banget/g,"Really")
+      .replace(/itu/g,"that").replace(/Itu/g,"That")
+      .replace(/ada/g,"there is").replace(/Ada/g,"There is")
+      .replace(/pas /g,"when ").replace(/Pas /g,"When ");
+  }
+  if(selTone==="id"){
+    return txt
+      .replace(/Most /g,"Kebanyakan ").replace(/most /g,"kebanyakan ")
+      .replace(/ works/g," berhasil").replace(/Works/g,"Berhasil")
+      .replace(/Let's/g,"Yuk").replace(/let's/g,"yuk")
+      .replace(/Right\?/g,"Betul?").replace(/right\?/g,"betul?")
+      .replace(/Sound familiar\?/g,"Familiar?")
+      .replace(/This is/g,"Ini adalah").replace(/this is/g,"ini adalah")
+      .replace(/That's/g,"Itu").replace(/that's/g,"itu")
+      .replace(/Here's/g,"Ini dia").replace(/here's/g,"ini dia")
+      .replace(/What's/g,"Apa").replace(/what's/g,"apa")
+      .replace(/It's/g,"Ini").replace(/it's/g,"ini")
+      .replace(/There's/g,"Ada").replace(/there's/g,"ada")
+      .replace(/You're/g,"Kamu").replace(/you're/g,"kamu")
+      .replace(/I'm /g,"Saya ").replace(/i'm /g,"saya ")
+      .replace(/I've/g,"Saya sudah").replace(/i've/g,"saya sudah")
+      .replace(/I'll/g,"Saya akan").replace(/i'll/g,"saya akan")
+      .replace(/DM me/g,"DM saya").replace(/dm me/g,"DM saya")
+      .replace(/Let me/g,"Izinkan saya").replace(/let me/g,"izinkan saya")
+      .replace(/Sound like/g,"Terasa seperti")
+      .replace(/After working/g,"Setelah bekerja")
+      .replace(/Hot take:/g,"Pendapat saya:");
+  }
+  if(selTone==="short"){const w=txt.split(" ");if(w.length>150)return w.slice(0,150).join(" ")+"...";}
+  return txt;
+}
+
+function initApp(){
+  [1,2,3,4,5,6].forEach(ph=>{
+    const el=document.getElementById("ph"+ph);if(!el)return;el.innerHTML="";
+    PT.filter(p=>p.ph===ph).forEach(p=>{
+      const b=document.createElement("button");
+      b.className="pb"+(p.day===selDay?" on":"");
+      b.style.setProperty("--pc",p.color);
+      b.setAttribute("data-day",p.day);
+      b.innerHTML=`<div class="pb-n">Day ${p.day} — ${p.type}</div><div class="pb-s">${p.title}</div>`;
+      b.onclick=()=>{selDay=p.day;refAll();showPost();switchTab("Post");};
+      el.appendChild(b);
+    });
+  });
+  document.getElementById("TG").innerHTML="";
+  TONES.forEach(t=>{
+    const b=document.createElement("button");
+    b.className="tb"+(t.id===selTone?" on":"");
+    b.setAttribute("data-tone",t.id);
+    b.innerHTML=`<span class="ti">${t.i}</span><span class="tn">${t.n}</span><span class="ts">${t.s}</span>`;
+    b.onclick=()=>{selTone=t.id;refTones();showPost();};
+    document.getElementById("TG").appendChild(b);
+  });
+  const atg=document.getElementById("aiTypeGrid");if(atg){atg.innerHTML="";AI_TYPES.forEach(t=>{const b=document.createElement("button");b.className="ai-type"+(t.id===aiType?" on":"");b.innerHTML=`<span style="display:block;font-size:.9rem;margin-bottom:2px;">${t.e}</span><span style="display:block;font-size:.63rem;font-weight:700;">${t.l}</span><span style="display:block;font-size:.52rem;color:var(--txt4);margin-top:1px;">${t.s}</span>`;b.onclick=()=>{aiType=t.id;document.querySelectorAll(".ai-type").forEach(x=>x.classList.remove("on"));b.classList.add("on");updatePrompt();};atg.appendChild(b);});}
+  document.getElementById("appBrand").textContent=U.name+" · LinkedIn";
+  document.getElementById("liAv").textContent=U.init||"?";
+  document.getElementById("liNm").textContent=U.name;
+  document.getElementById("liHl").textContent=U.headline;
+  try{anlData=JSON.parse(localStorage.getItem("li_anl2")||"{}");}catch(e){anlData={};}
+  buildInputRows();showPost();updatePrompt();
+}
+
+function refAll(){document.querySelectorAll(".pb").forEach(b=>b.classList.toggle("on",parseInt(b.getAttribute("data-day"))===selDay));}
+function refTones(){document.querySelectorAll(".tb").forEach(b=>b.classList.toggle("on",b.getAttribute("data-tone")===selTone));}
+
+let editMode=false;
+
+function toggleEdit(){
+  editMode=!editMode;
+  const btn=document.getElementById("editToggleBtn");
+  const view=document.getElementById("postText");
+  const edit=document.getElementById("postEditArea");
+  const hint=document.getElementById("editHint");
+  if(editMode){
+    edit.value=view.textContent;
+    view.style.display="none";
+    edit.style.display="block";
+    hint.style.display="block";
+    btn.textContent="✅ Selesai Edit";
+    btn.style.borderColor="var(--accent2)";
+    btn.style.color="var(--accent2)";
+    edit.focus();
+  } else {
+    const edited=edit.value;
+    view.textContent=edited;
+    document.getElementById("liBody").textContent=edited;
+    edit.style.display="none";
+    view.style.display="block";
+    hint.style.display="none";
+    btn.textContent="✏️ Edit";
+    btn.style.borderColor="";
+    btn.style.color="";
+  }
+}
+
+function showPost(){
+  const p=PT.find(x=>x.day===selDay);if(!p)return;
+  const txt=applyTone(fill(p.text));
+  const col=PHC[p.ph];
+  if(editMode)toggleEdit();
+  document.getElementById("phaseBadge").innerHTML=`<div class="phase-badge" style="background:${col}18;border:1px solid ${col}33;color:${col};margin-bottom:14px;">Day ${p.day} \u00b7 ${p.type} \u00b7 ${PHN[p.ph]}</div>`;
+  document.getElementById("liBody").textContent=txt;
+  document.getElementById("postText").textContent=txt;
+  document.getElementById("ctaText").textContent=U.cta||"\u2014";
+  const ht=(U.hashtags||"").trim().split(/\s+/).map(h=>h.startsWith("#")?h:"#"+h).join(" ");
+  document.getElementById("htagText").textContent=ht||"\u2014";
+}
+
+function copyPost(){
+  const p=PT.find(x=>x.day===selDay);if(!p){toast("Pilih post dulu!");return;}
+  let txt;
+  if(editMode){
+    txt=document.getElementById("postEditArea").value.trim();
+  } else {
+    txt=document.getElementById("postText").textContent.trim();
+  }
+  const ht=(U.hashtags||"").trim().split(/\s+/).map(h=>h.startsWith("#")?h:"#"+h).join(" ");
+  copyText(txt+(ht?"\n\n"+ht:""));
+}
+
+
+function switchTab(t){
+  ["Post","Analytics","AI","Guide"].forEach(x=>{
+    document.getElementById("pg"+x)?.classList.toggle("on",x===t);
+    document.getElementById("tab"+x)?.classList.toggle("on",x===t);
+  });
+  if(t==="Analytics")renderAnalytics();
+  if(t==="AI")updatePrompt();
+}
+
+// ANALYTICS
+function buildInputRows(){
+  const wrap=document.getElementById("anlRows");if(!wrap)return;wrap.innerHTML="";
+  PT.forEach(p=>{const key="p"+p.day;const d=anlData[key]||{};const row=document.createElement("div");row.className="inp-row";row.innerHTML=`<div><div class="inp-lbl">D${p.day} · ${p.type}</div><div class="inp-day">${p.title}</div></div>${METRICS.map(m=>`<input class="inp-f" id="anl_${key}_${m}" type="number" min="0" placeholder="0" value="${d[m]||""}">`).join("")}`;wrap.appendChild(row);});
+}
+function saveData(){PT.forEach(p=>{const key="p"+p.day;const entry={};let has=false;METRICS.forEach(m=>{const v=parseInt(document.getElementById(`anl_${key}_${m}`)?.value||"0")||0;entry[m]=v;if(v>0)has=true;});if(has)anlData[key]=entry;else delete anlData[key];});localStorage.setItem("li_anl2",JSON.stringify(anlData));renderAnalytics();toast("✅ Data tersimpan!");}
+function clearData(){if(!confirm("Reset analytics?"))return;anlData={};localStorage.removeItem("li_anl2");buildInputRows();renderAnalytics();toast("🗑 Direset");}
+function setM(m,el){selMetric=m;document.querySelectorAll(".mt").forEach(b=>b.classList.remove("on"));el.classList.add("on");renderChart();}
+function renderAnalytics(){
+  const keys=Object.keys(anlData);let tI=0,tR=0,tC=0,tD=0,erS=0,erN=0;
+  keys.forEach(k=>{const d=anlData[k];tI+=d.impressions||0;tR+=d.reactions||0;tC+=d.comments||0;tD+=d.dms||0;if((d.impressions||0)>0){erS+=((d.reactions||0)+(d.comments||0))/d.impressions*100;erN++;}});
+  const avg=erN>0?(erS/erN).toFixed(1):0;
+  document.getElementById("stPosts").textContent=keys.length;
+  document.getElementById("stImpr").textContent=tI.toLocaleString("id-ID");
+  document.getElementById("stER").textContent=avg+"%";
+  document.getElementById("stReact").textContent=tR.toLocaleString("id-ID");
+  document.getElementById("stCom").textContent=tC.toLocaleString("id-ID");
+  document.getElementById("stDMs").textContent=tD.toLocaleString("id-ID");
+  renderChart();renderTable();renderTop();renderInsights();buildInputRows();
+}
+function renderChart(){
+  const rows=document.getElementById("chartRows");if(!rows)return;rows.innerHTML="";
+  const vals=PT.map(p=>{const d=anlData["p"+p.day]||{};return selMetric==="er"?(d.impressions>0?((d.reactions||0)+(d.comments||0))/d.impressions*100:0):d[selMetric]||0;});
+  const max=Math.max(...vals,1);const col=MC[selMetric]||"#5865f2";
+  PT.forEach((p,i)=>{const v=vals[i];const pct=v?Math.max(v/max*100,1.5):0;const disp=selMetric==="er"?v.toFixed(1)+"%":v.toLocaleString("id-ID");const row=document.createElement("div");row.className="ch-row";row.innerHTML=`<div class="ch-lbl">D${p.day}</div><div class="ch-bg"><div class="ch-bar" style="width:${pct}%;background:${col};"></div>${v>0?`<span class="ch-bar-lbl">${p.type}</span>`:""}</div><div class="ch-val" style="color:${v>0?col:"var(--txt4)"}">${v>0?disp:"—"}</div>`;rows.appendChild(row);});
+}
+function renderTable(){
+  const tbody=document.getElementById("tblBody");if(!tbody)return;
+  const rows=PT.map(p=>{const d=anlData["p"+p.day];if(!d)return null;const er=(d.impressions||0)>0?((d.reactions||0)+(d.comments||0))/d.impressions*100:0;return{p,d,er};}).filter(Boolean);
+  if(!rows.length){tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--txt4);padding:24px;font-size:.75rem;">Belum ada data.</td></tr>`;return;}
+  const mI=Math.max(...rows.map(r=>r.d.impressions||0)),mR=Math.max(...rows.map(r=>r.d.reactions||0)),mER=Math.max(...rows.map(r=>r.er)),mD=Math.max(...rows.map(r=>r.d.dms||0));
+  tbody.innerHTML=rows.map(r=>`<tr><td>D${r.p.day} · ${r.p.type}</td><td class="${(r.d.impressions||0)===mI&&mI>0?"hi":""}">${(r.d.impressions||0).toLocaleString("id-ID")}</td><td class="${(r.d.reactions||0)===mR&&mR>0?"hi":""}">${r.d.reactions||0}</td><td>${r.d.comments||0}</td><td>${r.d.reposts||0}</td><td>${r.d.clicks||0}</td><td style="color:var(--accent3);" class="${(r.d.dms||0)===mD&&mD>0?"hi":""}">${r.d.dms||0}</td><td class="er-c ${r.er===mER&&mER>0?"hi":""}">${r.er.toFixed(1)}%</td></tr>`).join("");
+}
+function renderTop(){
+  const wrap=document.getElementById("topPosts");if(!wrap)return;
+  const rows=PT.map(p=>{const d=anlData["p"+p.day];if(!d||(d.impressions||0)===0)return null;const er=((d.reactions||0)+(d.comments||0))/d.impressions*100;return{p,d,er};}).filter(Boolean).sort((a,b)=>b.er-a.er).slice(0,5);
+  if(!rows.length){wrap.innerHTML=`<div class="empty"><div class="empty-ic">📊</div><div class="empty-tx">Tambahkan data untuk melihat top posts.</div></div>`;return;}
+  wrap.innerHTML=rows.map((r,i)=>`<div class="top-item"><div class="top-rank ${i===0?"r1":i===1?"r2":i===2?"r3":""}">${i===0?"🥇":i===1?"🥈":i===2?"🥉":"#"+(i+1)}</div><div class="top-info"><div class="top-name">Day ${r.p.day} — ${r.p.title}</div><div class="top-meta">${(r.d.impressions||0).toLocaleString("id-ID")} impr · ${PHN[r.p.ph]}</div></div><div class="top-stats"><div class="top-stat">${r.d.reactions||0}<span class="top-stat-l">React</span></div><div class="top-stat">${r.d.comments||0}<span class="top-stat-l">Komen</span></div><div class="top-stat" style="color:var(--accent3);">${r.d.dms||0}<span class="top-stat-l">DMs</span></div><div class="top-stat" style="color:#fb923c;">${r.er.toFixed(1)}%<span class="top-stat-l">ER</span></div></div></div>`).join("");
+}
+function renderInsights(){
+  const rows=PT.map(p=>{const d=anlData["p"+p.day];if(!d||(d.impressions||0)===0)return null;const er=((d.reactions||0)+(d.comments||0))/d.impressions*100;return{p,d,er};}).filter(Boolean);
+  const ic=document.getElementById("insCard");if(!ic)return;
+  if(rows.length<3){ic.style.display="none";return;}
+  const sorted=[...rows].sort((a,b)=>b.er-a.er);const top=sorted[0];
+  const avg=rows.reduce((s,r)=>s+r.er,0)/rows.length;
+  const bestDM=[...rows].sort((a,b)=>(b.d.dms||0)-(a.d.dms||0))[0];
+  const ins=[
+    `<strong>Post terbaik: Day ${top.p.day} — ${top.p.type} (${top.er.toFixed(1)}% ER)</strong>. Replikasi formula konten ini.`,
+    `<strong>Avg Engagement Rate: ${avg.toFixed(1)}%</strong>. ${avg>5?"Di atas average LinkedIn — bagus!":avg>2?"Di range normal. Konsisten!":"Coba tambah pertanyaan di akhir post."}`,
+    (bestDM.d.dms||0)>0?`<strong>Post paling banyak DM: Day ${bestDM.p.day} (${bestDM.d.dms} DMs)</strong>. Tipe konten ini paling convert ke leads.`:null,
+  ].filter(Boolean);
+  ic.style.display="block";
+  document.getElementById("insBody").innerHTML=ins.map(t=>`<div class="ins-row"><div class="ins-dot"></div><div class="ins-txt">${t}</div></div>`).join("");
+}
+
+// AI GENERATE
+function setLen(l,el){aiLen=l;document.querySelectorAll(".ai-len").forEach(b=>b.classList.remove("on"));el.classList.add("on");updatePrompt();}
+function updatePrompt(){
+  const el=document.getElementById("promptPrev");if(!el)return;
+  const angle=document.getElementById("aiAngle")?.value?.trim()||"";
+  const typeObj=AI_TYPES.find(t=>t.id===aiType);
+  const lenMap={short:"~80-120 kata",medium:"~150-220 kata",long:"~250-320 kata"};
+  const n=U.name||"[Nama belum disetup]";
+  el.textContent=`Kamu adalah expert LinkedIn content writer untuk ${n}.
+
+PROFIL:
+- Layanan: ${U.service||"[belum disetup]"}
+- Target: ${U.target||"[belum disetup]"}
+- Hasil: ${U.result||"[belum disetup]"}
+- CTA: ${U.cta||"[belum disetup]"} (DM: "${U.dm||"..."}")
+${U.case1?`- Case study: ${U.case1.slice(0,150)}...`:""}
+
+GAYA:
+- Kalimat pendek. Banyak baris kosong. Bullet ❌/✅.
+- Tone: direct, confident, authentic.
+- Akhiri dengan hook ke DM "${U.dm||"..."}"
+
+TIPE: ${typeObj?.l} — ${typeObj?.s}
+${angle?"ANGLE: "+angle:""}
+PANJANG: ${lenMap[aiLen]}
+
+Tulis LANGSUNG post-nya. Tanpa intro. Tanpa hashtag.`;
+}
+function aiGen(){
+  if(!U.name){toast("Setup brand dulu sebelum generate!");return;}
+  const prompt=document.getElementById("promptPrev")?.textContent||"";
+  window.open("https://claude.ai/new?q="+encodeURIComponent(prompt),"_blank");
+  toast("✅ Claude.ai terbuka — klik Send untuk generate!");
+}
+
+// SKIN
+function setSkin(s){
+  const map={dark:"",light:"sk-l",green:"sk-g"};
+  document.body.className=map[s]||"";
+  document.querySelectorAll(".sk").forEach(b=>b.classList.remove("on"));
+  document.getElementById("sk-"+s)?.classList.add("on");
+  localStorage.setItem("li_skin2",s);
+}
+
+function toast(m){const t=document.getElementById("T");if(!t)return;t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),2500);}
+
+// BOOT — wait for DOM
+document.addEventListener("DOMContentLoaded",function(){
+
+  // Paket 3 toggle
+  const t3el=document.getElementById("w-t3on");
+  if(t3el){
+    t3el.addEventListener("change",function(){
+      const w=document.getElementById("w-t3wrap");
+      if(w){w.style.opacity=this.checked?"1":"0.4";w.style.pointerEvents=this.checked?"":"none";}
+    });
+  }
+
+  // Apply saved skin
+  const sk=localStorage.getItem("li_skin2")||"dark";
+  setSkin(sk);
+
+  // Auto-load saved config
+  try{
+    const cfg=localStorage.getItem("li_cfg");
+    if(cfg){
+      U=JSON.parse(cfg);
+      selTone=U.tone||"mix";
+      document.getElementById("setupOverlay").style.display="none";
+      document.getElementById("mainApp").style.display="grid";
+      initApp();
+    }
+  }catch(e){localStorage.removeItem("li_cfg");}
+
+});
+</script>
+</body>
+</html>
