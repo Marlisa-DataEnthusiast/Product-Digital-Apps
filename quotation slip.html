@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quotation Slip</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0d1117; --card:#161b22; --card2:#1c2128; --border:#30363d;
+  --accent:#38bdf8; --accent2:#f472b6; --accent3:#34d399;
+  --gold:#fbbf24; --text:#e6edf3; --muted:#7d8590;
+  --draft:#7d8590; --sent:#38bdf8; --approved:#34d399; --rejected:#f87171;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 40% at 10% 10%,rgba(56,189,248,.07),transparent 60%),
+             radial-gradient(ellipse 50% 40% at 90% 90%,rgba(244,114,182,.06),transparent 60%);}
+
+#app{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:24px 16px 60px;}
+
+/* TABS */
+.tabs{display:flex;gap:5px;background:var(--card);border-radius:14px;padding:5px;border:1px solid var(--border);width:fit-content;margin-bottom:28px;}
+.tab{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;padding:9px 20px;border-radius:10px;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s;letter-spacing:.5px;}
+.tab.active{background:linear-gradient(135deg,#0284c7,var(--accent));color:#fff;box-shadow:0 4px 14px rgba(56,189,248,.3);}
+
+.section{display:none;}
+.section.active{display:block;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px;box-shadow:0 4px 20px rgba(0,0,0,.3);margin-bottom:16px;}
+.card-title{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:'';display:block;width:4px;height:16px;border-radius:2px;background:linear-gradient(var(--accent),var(--accent2));}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.form-full{grid-column:1/-1;}
+.field label{display:block;font-size:.68rem;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
+.field input,.field select,.field textarea{width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:9px 13px;color:var(--text);font-family:inherit;font-size:.88rem;font-weight:500;outline:none;transition:border-color .2s,box-shadow .2s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(56,189,248,.12);}
+.field textarea{resize:vertical;min-height:65px;}
+.field select option{background:var(--card2);}
+
+/* LOGO */
+.logo-area{border:2px dashed var(--border);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.logo-area:hover{border-color:var(--accent);background:rgba(56,189,248,.04);}
+.logo-area img{max-height:70px;max-width:180px;object-fit:contain;}
+.logo-ph{color:var(--muted);font-size:.82rem;}
+.logo-ph span{font-size:1.8rem;display:block;margin-bottom:4px;}
+#logoInput{position:absolute;inset:0;opacity:0;cursor:pointer;}
+
+/* STATUS SELECT */
+.status-select{appearance:none;font-weight:800;letter-spacing:.5px;font-size:.8rem;}
+.status-draft{background:rgba(125,133,144,.15)!important;border-color:var(--draft)!important;color:var(--draft)!important;}
+.status-sent{background:rgba(56,189,248,.12)!important;border-color:var(--sent)!important;color:var(--sent)!important;}
+.status-approved{background:rgba(52,211,153,.12)!important;border-color:var(--approved)!important;color:var(--approved)!important;}
+.status-rejected{background:rgba(248,113,113,.12)!important;border-color:var(--rejected)!important;color:var(--rejected)!important;}
+
+/* ITEMS */
+.items-table{width:100%;border-collapse:collapse;font-size:.86rem;}
+.items-table th{font-size:.65rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.items-table td{padding:7px 5px;vertical-align:middle;}
+.items-table input{background:var(--card2);border:1.5px solid transparent;border-radius:8px;padding:7px 9px;color:var(--text);font-family:inherit;font-size:.86rem;outline:none;transition:border-color .2s;width:100%;}
+.items-table input:focus{border-color:var(--accent);}
+.item-sub{font-weight:700;color:var(--accent3);font-size:.9rem;white-space:nowrap;}
+.btn-del{background:rgba(248,113,113,.1);border:none;border-radius:7px;color:#f87171;width:30px;height:30px;cursor:pointer;font-size:.9rem;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.btn-del:hover{background:rgba(248,113,113,.22);}
+
+/* TOTALS */
+.totals-box{background:var(--card2);border-radius:14px;padding:16px 18px;border:1px solid var(--border);min-width:270px;}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:.88rem;}
+.total-row+.total-row{border-top:1px solid var(--border);}
+.total-row.grand{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:800;color:var(--gold);padding-top:10px;margin-top:3px;border-top:2px solid var(--border);}
+.total-row label{color:var(--muted);font-size:.78rem;font-weight:700;}
+.bottom-area{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-top:14px;flex-wrap:wrap;}
+.bottom-left{flex:1;min-width:200px;}
+
+/* BUTTONS */
+.btn{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;border:none;border-radius:11px;padding:10px 20px;cursor:pointer;transition:all .15s;letter-spacing:.5px;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:linear-gradient(135deg,#0284c7,var(--accent));color:#fff;box-shadow:0 4px 14px rgba(56,189,248,.25);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(56,189,248,.35);}
+.btn-secondary{background:var(--card2);color:var(--text);border:1.5px solid var(--border);}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
+.btn-success{background:linear-gradient(135deg,#059669,var(--accent3));color:#fff;box-shadow:0 4px 14px rgba(52,211,153,.2);}
+.btn-gold{background:linear-gradient(135deg,#d97706,var(--gold));color:#111;font-weight:800;box-shadow:0 4px 14px rgba(251,191,36,.2);}
+.btn-gold:hover{transform:translateY(-2px);}
+.btn-danger{background:rgba(248,113,113,.1);color:#f87171;border:1.5px solid rgba(248,113,113,.2);}
+.btn-danger:hover{background:rgba(248,113,113,.2);}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.btn-add{width:100%;margin-top:8px;justify-content:center;background:rgba(56,189,248,.07);color:var(--accent);border:1.5px dashed rgba(56,189,248,.25);border-radius:9px;padding:9px;}
+.btn-add:hover{background:rgba(56,189,248,.13);}
+
+/* BADGE */
+.qt-badge{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(244,114,182,.08));border:1px solid rgba(56,189,248,.25);border-radius:50px;padding:5px 15px;font-family:'Syne',sans-serif;font-size:.82rem;font-weight:800;color:var(--accent);margin-bottom:20px;letter-spacing:1px;}
+
+/* HISTORY */
+.history-empty{text-align:center;padding:60px 20px;color:var(--muted);}
+.history-empty span{font-size:3rem;display:block;margin-bottom:10px;}
+.qt-list-item{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:14px;margin-bottom:8px;transition:all .2s;cursor:pointer;}
+.qt-list-item:hover{border-color:var(--accent);transform:translateX(4px);}
+.qt-list-num{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:800;color:var(--accent);min-width:110px;}
+.qt-list-client{flex:1;font-weight:700;}
+.qt-list-date{font-size:.76rem;color:var(--muted);}
+.qt-list-amount{font-family:'Syne',sans-serif;font-weight:800;color:var(--gold);}
+.qt-list-actions{display:flex;gap:5px;}
+
+.sbadge{font-size:.62rem;font-weight:800;letter-spacing:1px;padding:3px 9px;border-radius:50px;text-transform:uppercase;}
+.sbadge-draft{background:rgba(125,133,144,.15);color:var(--draft);}
+.sbadge-sent{background:rgba(56,189,248,.12);color:var(--sent);}
+.sbadge-approved{background:rgba(52,211,153,.12);color:var(--approved);}
+.sbadge-rejected{background:rgba(248,113,113,.12);color:var(--rejected);}
+
+/* ═══════════════════════════════
+   QUOTATION PRINT PREVIEW
+═══════════════════════════════ */
+#qtPreview{background:#fff;color:#111;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);font-family:'Plus Jakarta Sans',sans-serif;}
+
+.qt-hdr{background:linear-gradient(135deg,#0c1a2e,#0f2a4a);padding:30px 34px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
+.qt-logo-img{max-height:56px;max-width:150px;object-fit:contain;margin-bottom:8px;}
+.qt-company{font-size:1.2rem;font-weight:900;color:#fff;font-family:'Syne',sans-serif;}
+.qt-company-sub{font-size:.75rem;color:rgba(255,255,255,.45);margin-top:2px;}
+.qt-title-area{text-align:right;}
+.qt-title{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;background:linear-gradient(135deg,#38bdf8,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+.qt-subtitle{font-size:.72rem;color:rgba(255,255,255,.4);margin-top:3px;font-weight:600;}
+.qt-num{font-size:.75rem;color:rgba(255,255,255,.45);margin-top:2px;}
+
+/* STATUS BANNER */
+.qt-status-bar{padding:10px 34px;display:flex;align-items:center;gap:10px;font-size:.75rem;font-weight:700;}
+.qt-status-bar.draft{background:#1a1f26;color:#7d8590;}
+.qt-status-bar.sent{background:#0c1e30;color:#38bdf8;}
+.qt-status-bar.approved{background:#0a1f18;color:#34d399;}
+.qt-status-bar.rejected{background:#1f0e0e;color:#f87171;}
+
+.qt-body{padding:26px 34px;}
+.qt-parties{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px;}
+.qt-party-lbl{font-size:.62rem;font-weight:800;letter-spacing:2px;color:#999;text-transform:uppercase;margin-bottom:5px;}
+.qt-party-name{font-size:.95rem;font-weight:800;color:#111;}
+.qt-party-detail{font-size:.78rem;color:#666;margin-top:2px;line-height:1.5;}
+
+/* validity box */
+.validity-box{display:inline-flex;align-items:center;gap:6px;background:#f0fafb;border:1.5px solid #bae6fd;border-radius:10px;padding:7px 14px;font-size:.78rem;font-weight:700;color:#0284c7;margin-bottom:20px;}
+
+.qt-table{width:100%;border-collapse:collapse;margin-bottom:18px;font-size:.84rem;}
+.qt-table thead tr{background:linear-gradient(135deg,#0284c7,#38bdf8);}
+.qt-table th{padding:9px 13px;color:#fff;font-weight:700;font-size:.68rem;letter-spacing:1px;text-transform:uppercase;text-align:left;}
+.qt-table th:last-child,.qt-table td:last-child{text-align:right;}
+.qt-table tbody tr{border-bottom:1px solid #f0f0f8;}
+.qt-table tbody tr:nth-child(even){background:#f9f9fc;}
+.qt-table td{padding:9px 13px;color:#333;}
+.qt-table td:last-child{font-weight:700;color:#0c1a2e;}
+
+.qt-totals{display:flex;justify-content:flex-end;margin-bottom:18px;}
+.qt-totals-box{min-width:250px;}
+.qt-tot-row{display:flex;justify-content:space-between;padding:5px 0;font-size:.82rem;border-bottom:1px solid #f0f0f5;}
+.qt-tot-row label{color:#888;}
+.qt-tot-grand{display:flex;justify-content:space-between;padding:11px 14px;margin-top:4px;border-radius:11px;background:linear-gradient(135deg,#0c1a2e,#0f2a4a);}
+.qt-tot-grand label{color:rgba(255,255,255,.6);font-weight:700;}
+.qt-tot-grand span{color:#fbbf24;font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:800;}
+
+.qt-notes{background:#f8f9fc;border-radius:10px;padding:13px 15px;margin-bottom:18px;}
+.qt-notes-lbl{font-size:.62rem;font-weight:800;letter-spacing:2px;color:#999;text-transform:uppercase;margin-bottom:3px;}
+.qt-notes-txt{font-size:.8rem;color:#555;line-height:1.6;}
+
+/* SIGNATURE AREA */
+.sign-area{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:18px;}
+.sign-box{border:1.5px dashed #ddd;border-radius:10px;padding:14px;text-align:center;}
+.sign-lbl{font-size:.65rem;font-weight:800;letter-spacing:1.5px;color:#999;text-transform:uppercase;margin-bottom:40px;}
+.sign-line{border-top:1.5px solid #ccc;padding-top:6px;font-size:.72rem;color:#888;}
+.sign-canvas-wrap{margin:4px auto 6px;display:block;}
+canvas.sign-canvas{border:1px solid #e0e0e0;border-radius:6px;background:#fff;cursor:crosshair;touch-action:none;}
+
+.qt-footer{background:linear-gradient(135deg,#0284c7,#f472b6);padding:12px 34px;text-align:center;}
+.qt-footer-txt{color:rgba(255,255,255,.9);font-size:.76rem;font-weight:600;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:26px;width:100%;max-width:400px;animation:fadeIn .25s ease;}
+.modal h3{font-family:'Syne',sans-serif;font-size:1.15rem;margin-bottom:5px;}
+.modal p{color:var(--muted);font-size:.83rem;margin-bottom:18px;}
+
+/* CONVERT MODAL */
+#convertModal .modal{max-width:440px;}
+.convert-info{background:var(--card2);border-radius:12px;padding:14px;border:1px solid var(--border);margin-bottom:16px;font-size:.84rem;}
+.convert-info div{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);}
+.convert-info div:last-child{border-bottom:none;}
+.convert-info label{color:var(--muted);}
+
+@media print{
+  body *{visibility:hidden;}
+  #qtPreview,#qtPreview *{visibility:visible;}
+  #qtPreview{position:fixed;inset:0;border-radius:0;box-shadow:none;}
+}
+@media(max-width:600px){
+  .form-grid,.form-grid.three{grid-template-columns:1fr;}
+  .qt-parties,.sign-area{grid-template-columns:1fr;}
+  .qt-hdr{flex-direction:column;}
+  .qt-title-area{text-align:left;}
+  .bottom-area{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;line-height:1;">
+        Quotation <span style="background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Slip</span>
+      </div>
+      <div style="color:var(--muted);font-size:.78rem;margin-top:3px;">Buat penawaran harga profesional & convert ke invoice</div>
+    </div>
+    <div class="qt-badge">📋 QT-<span id="qtNumDisplay">001</span></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('buat',this)">✏️ Buat Quotation</button>
+    <button class="tab" onclick="switchTab('preview',this)">👁️ Preview</button>
+    <button class="tab" onclick="switchTab('history',this)">📋 History</button>
+  </div>
+
+  <!-- ══ TAB BUAT ══ -->
+  <div class="section active" id="tab-buat">
+
+    <!-- Bisnis -->
+    <div class="card">
+      <div class="card-title">🏢 Info Bisnis</div>
+      <div class="form-grid">
+        <div class="field form-full">
+          <label>Logo</label>
+          <div class="logo-area" onclick="document.getElementById('logoInput').click()">
+            <input type="file" id="logoInput" accept="image/*" onchange="loadLogo(event)">
+            <div class="logo-ph" id="logoPh"><span>🖼️</span>Klik upload logo</div>
+            <img id="logoImg" style="display:none">
+          </div>
+        </div>
+        <div class="field"><label>Nama Bisnis *</label><input id="bizName" placeholder="Toko / Studio Kamu"></div>
+        <div class="field"><label>Tagline</label><input id="bizTagline" placeholder="Produk & Jasa Terbaik"></div>
+        <div class="field"><label>Telepon / WA</label><input id="bizPhone" placeholder="0812-xxxx-xxxx"></div>
+        <div class="field"><label>Email</label><input id="bizEmail" placeholder="usaha@email.com"></div>
+        <div class="field form-full"><label>Alamat</label><textarea id="bizAddr" placeholder="Jl. Contoh No. 1, Kota"></textarea></div>
+      </div>
+    </div>
+
+    <!-- Quotation Detail -->
+    <div class="card">
+      <div class="card-title">📋 Detail Quotation</div>
+      <div class="form-grid three">
+        <div class="field">
+          <label>No. Quotation</label>
+          <input id="qtNumber" value="QT-001" oninput="document.getElementById('qtNumDisplay').textContent=this.value.replace('QT-','')">
+        </div>
+        <div class="field"><label>Tanggal Dibuat</label><input type="date" id="qtDate"></div>
+        <div class="field"><label>Berlaku Hingga</label><input type="date" id="qtValid"></div>
+        <div class="field form-full">
+          <label>Status</label>
+          <select id="qtStatus" class="status-select" onchange="updateStatusStyle()">
+            <option value="draft">📝 Draft</option>
+            <option value="sent">📤 Dikirim</option>
+            <option value="approved">✅ Disetujui</option>
+            <option value="rejected">❌ Ditolak</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pelanggan -->
+    <div class="card">
+      <div class="card-title">👤 Info Calon Pelanggan</div>
+      <div class="form-grid">
+        <div class="field"><label>Nama *</label><input id="clientName" placeholder="Budi Santoso"></div>
+        <div class="field"><label>Telepon</label><input id="clientPhone" placeholder="0812-xxxx-xxxx"></div>
+        <div class="field"><label>Email</label><input id="clientEmail" placeholder="pelanggan@email.com"></div>
+        <div class="field"><label>Perusahaan</label><input id="clientCompany" placeholder="PT. Contoh (opsional)"></div>
+        <div class="field form-full"><label>Alamat</label><textarea id="clientAddr" placeholder="Alamat pelanggan"></textarea></div>
+      </div>
+    </div>
+
+    <!-- Items -->
+    <div class="card">
+      <div class="card-title">🛒 Item Penawaran</div>
+      <div style="overflow-x:auto;">
+        <table class="items-table">
+          <thead><tr>
+            <th style="width:32%">Nama Item</th>
+            <th style="width:14%">Jenis</th>
+            <th style="width:22%">Deskripsi</th>
+            <th style="width:10%">Qty</th>
+            <th style="width:16%">Harga</th>
+            <th style="width:12%">Subtotal</th>
+            <th style="width:4%"></th>
+          </tr></thead>
+          <tbody id="itemsBody"></tbody>
+        </table>
+      </div>
+      <button class="btn btn-add" onclick="addItem()">＋ Tambah Item</button>
+
+      <div class="bottom-area">
+        <div class="bottom-left">
+          <div class="field" style="margin-bottom:10px;">
+            <label>Catatan Penawaran</label>
+            <textarea id="qtNotes" placeholder="Harga berlaku sesuai masa penawaran. Hubungi kami untuk info lebih lanjut."></textarea>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div class="field" style="flex:1;min-width:110px;"><label>Diskon (%)</label><input type="number" id="discPct" value="0" min="0" max="100" oninput="calcTotals()"></div>
+            <div class="field" style="flex:1;min-width:110px;"><label>PPN (%)</label><input type="number" id="taxPct" value="0" min="0" max="100" oninput="calcTotals()"></div>
+          </div>
+        </div>
+        <div class="totals-box">
+          <div class="total-row"><label>Subtotal</label><span id="totSub">Rp 0</span></div>
+          <div class="total-row"><label>Diskon</label><span id="totDisc" style="color:#f87171">- Rp 0</span></div>
+          <div class="total-row"><label>PPN</label><span id="totTax">+ Rp 0</span></div>
+          <div class="total-row grand"><label>TOTAL</label><span id="totGrand">Rp 0</span></div>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top:18px;">
+        <button class="btn btn-primary" onclick="generatePreview()">👁️ Preview</button>
+        <button class="btn btn-success" onclick="saveQt()">💾 Simpan</button>
+        <button class="btn btn-gold" onclick="convertToInvoice()">🧾 Convert ke Invoice</button>
+        <button class="btn btn-secondary" onclick="resetForm()">🔄 Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB PREVIEW ══ -->
+  <div class="section" id="tab-preview">
+    <div class="btn-row" style="margin-bottom:16px;">
+      <button class="btn btn-primary" onclick="window.print()">🖨️ Print / Save PDF</button>
+      <button class="btn btn-success" onclick="saveQt()">💾 Simpan</button>
+      <button class="btn btn-gold" onclick="convertToInvoice()">🧾 Convert ke Invoice</button>
+      <button class="btn btn-secondary" onclick="switchTab('buat',document.querySelectorAll(\'.tab\')[0])">✏️ Edit</button>
+    </div>
+    <div id="qtPreview"></div>
+  </div>
+
+  <!-- ══ TAB HISTORY ══ -->
+  <div class="section" id="tab-history">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+      <div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;">Semua Quotation</div>
+      <button class="btn btn-danger" onclick="clearAll()">🗑️ Hapus Semua</button>
+    </div>
+    <div id="historyList"></div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRM -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <h3 id="modalTitle">Konfirmasi</h3>
+    <p id="modalMsg">Yakin?</p>
+    <div class="btn-row">
+      <button class="btn btn-danger" id="modalOk">Ya</button>
+      <button class="btn btn-secondary" onclick="closeModal('confirmModal')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONVERT -->
+<div class="modal-overlay" id="convertModal">
+  <div class="modal" style="max-width:480px;">
+    <h3>🧾 Convert ke Invoice</h3>
+    <p>Quotation ini akan dijadikan dasar invoice baru. Data akan di-copy otomatis.</p>
+    <div class="convert-info" id="convertInfo"></div>
+    <div class="field" style="margin-bottom:14px;">
+      <label>No. Invoice Baru</label>
+      <input id="newInvNum" placeholder="INV-001">
+    </div>
+    <div class="field" style="margin-bottom:16px;">
+      <label>Tanggal Invoice</label>
+      <input type="date" id="newInvDate">
+    </div>
+    <div class="field" style="margin-bottom:16px;">
+      <label>Jatuh Tempo</label>
+      <input type="date" id="newInvDue">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="doConvert()">✅ Buat Invoice</button>
+      <button class="btn btn-secondary" onclick="closeModal('convertModal')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════
+// STATE
+// ══════════════════════
+let items = [];
+let logoUrl = '';
+let quotations = JSON.parse(localStorage.getItem('quotations') || '[]');
+let editingId = null;
+let convertData = null;
+
+// Shared invoice storage (sama dengan invoice-generator.html via localStorage key)
+function getInvoices(){ return JSON.parse(localStorage.getItem('invoices') || '[]'); }
+function saveInvoices(arr){ localStorage.setItem('invoices', JSON.stringify(arr)); }
+
+// ══════════════════════
+// INIT
+// ══════════════════════
+document.addEventListener('DOMContentLoaded', ()=>{
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('qtDate').value = today;
+  const valid = new Date(); valid.setDate(valid.getDate()+14);
+  document.getElementById('qtValid').value = valid.toISOString().split('T')[0];
+  autoQtNumber();
+  addItem();
+  renderHistory();
+  updateStatusStyle();
+});
+
+function autoQtNumber(){
+  const num = (quotations.length + 1).toString().padStart(3,'0');
+  document.getElementById('qtNumber').value = `QT-${num}`;
+  document.getElementById('qtNumDisplay').textContent = num;
+}
+
+// ══════════════════════
+// TABS
+// ══════════════════════
+function switchTab(id, el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+  if(id==='preview') generatePreview();
+  if(id==='history') renderHistory();
+}
+
+// ══════════════════════
+// STATUS STYLE
+// ══════════════════════
+function updateStatusStyle(){
+  const sel = document.getElementById('qtStatus');
+  sel.className = 'status-select status-'+sel.value;
+  // Update field styling too
+  sel.style.padding = '9px 13px';
+}
+
+// ══════════════════════
+// LOGO
+// ══════════════════════
+function loadLogo(e){
+  const file = e.target.files[0]; if(!file) return;
+  const r = new FileReader();
+  r.onload = x => {
+    logoUrl = x.target.result;
+    document.getElementById('logoImg').src = logoUrl;
+    document.getElementById('logoImg').style.display = 'block';
+    document.getElementById('logoPh').style.display = 'none';
+  };
+  r.readAsDataURL(file);
+}
+
+// ══════════════════════
+// ITEMS
+// ══════════════════════
+function addItem(){
+  items.push({id:Date.now(), name:'', type:'Produk', desc:'', qty:1, price:0});
+  renderItems();
+}
+function removeItem(id){
+  items = items.filter(i=>i.id!==id);
+  renderItems(); calcTotals();
+}
+function updateItem(id, field, val){
+  const it = items.find(i=>i.id===id);
+  if(it) it[field] = val;
+  renderItems();
+}
+function renderItems(){
+  const tbody = document.getElementById('itemsBody');
+  tbody.innerHTML = '';
+  items.forEach(it=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input placeholder="Nama item" value="${escHtml(it.name)}" oninput="updateItem(${it.id},'name',this.value)"></td>
+      <td><select style="background:var(--card2);border:1.5px solid var(--border);border-radius:7px;padding:7px 6px;color:var(--text);font-family:inherit;font-size:.82rem;outline:none;width:100%" onchange="updateItem(${it.id},'type',this.value)">
+        <option ${it.type==='Produk'?'selected':''}>Produk</option>
+        <option ${it.type==='Jasa'?'selected':''}>Jasa</option>
+      </select></td>
+      <td><input placeholder="Keterangan" value="${escHtml(it.desc)}" oninput="updateItem(${it.id},'desc',this.value)"></td>
+      <td><input type="number" min="1" value="${it.qty}" oninput="updateItem(${it.id},'qty',+this.value);calcTotals()" style="text-align:center"></td>
+      <td><input type="number" min="0" value="${it.price}" oninput="updateItem(${it.id},'price',+this.value);calcTotals()" style="text-align:right"></td>
+      <td class="item-sub">${fmtRp(it.qty*it.price)}</td>
+      <td><button class="btn-del" onclick="removeItem(${it.id})">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  calcTotals();
+}
+
+function escHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ══════════════════════
+// TOTALS
+// ══════════════════════
+function calcTotals(){
+  const sub = items.reduce((s,i)=>s+i.qty*i.price,0);
+  const dp = +document.getElementById('discPct').value||0;
+  const tp = +document.getElementById('taxPct').value||0;
+  const disc = sub*dp/100;
+  const tax  = (sub-disc)*tp/100;
+  const grand= sub-disc+tax;
+  document.getElementById('totSub').textContent   = fmtRp(sub);
+  document.getElementById('totDisc').textContent  = `- ${fmtRp(disc)}`;
+  document.getElementById('totTax').textContent   = `+ ${fmtRp(tax)}`;
+  document.getElementById('totGrand').textContent = fmtRp(grand);
+  return {sub, disc, tax, grand, dp, tp};
+}
+
+function fmtRp(n){ return 'Rp '+ Math.round(n).toLocaleString('id-ID'); }
+function fmtDate(str){ if(!str) return '—'; const d=new Date(str); return d.toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}); }
+
+// ══════════════════════
+// COLLECT
+// ══════════════════════
+function collectData(){
+  const t = calcTotals();
+  return {
+    id: editingId || Date.now(),
+    qtNumber: document.getElementById('qtNumber').value,
+    qtDate:   document.getElementById('qtDate').value,
+    qtValid:  document.getElementById('qtValid').value,
+    status:   document.getElementById('qtStatus').value,
+    bizName:  document.getElementById('bizName').value||'Nama Bisnis',
+    bizTagline:document.getElementById('bizTagline').value,
+    bizPhone: document.getElementById('bizPhone').value,
+    bizEmail: document.getElementById('bizEmail').value,
+    bizAddr:  document.getElementById('bizAddr').value,
+    clientName:   document.getElementById('clientName').value||'Calon Pelanggan',
+    clientPhone:  document.getElementById('clientPhone').value,
+    clientEmail:  document.getElementById('clientEmail').value,
+    clientCompany:document.getElementById('clientCompany').value,
+    clientAddr:   document.getElementById('clientAddr').value,
+    notes:   document.getElementById('qtNotes').value,
+    items:   [...items],
+    logo:    logoUrl,
+    ...t,
+    savedAt: new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
+  };
+}
+
+// ══════════════════════
+// PREVIEW
+// ══════════════════════
+const STATUS_LABEL = {draft:'📝 Draft',sent:'📤 Sudah Dikirim',approved:'✅ Disetujui',rejected:'❌ Ditolak'};
+const STATUS_MSG   = {draft:'Penawaran masih dalam proses.',sent:'Menunggu konfirmasi dari pelanggan.',approved:'Penawaran telah disetujui pelanggan.',rejected:'Penawaran tidak dilanjutkan.'};
+
+function generatePreview(){
+  const d = collectData();
+  const logoHtml = d.logo ? `<img src="${d.logo}" class="qt-logo-img">` : `<div style="font-size:1.8rem;margin-bottom:6px">🏪</div>`;
+  const rowsHtml = d.items.map(it=>`
+    <tr>
+      <td>${it.name||'—'}</td>
+      <td><span style="background:${it.type==='Jasa'?'rgba(56,189,248,.15)':'rgba(52,211,153,.15)'};color:${it.type==='Jasa'?'#38bdf8':'#34d399'};padding:2px 8px;border-radius:50px;font-size:.68rem;font-weight:700">${it.type}</span></td>
+      <td style="color:#888;font-size:.8rem">${it.desc||'—'}</td>
+      <td style="text-align:center">${it.qty}</td>
+      <td style="text-align:right">${fmtRp(it.price)}</td>
+      <td>${fmtRp(it.qty*it.price)}</td>
+    </tr>
+  `).join('');
+
+  const discRow = d.dp>0 ? `<div class="qt-tot-row"><label>Diskon (${d.dp}%)</label><span style="color:#f87171">- ${fmtRp(d.disc)}</span></div>` : '';
+  const taxRow  = d.tp>0 ? `<div class="qt-tot-row"><label>PPN (${d.tp}%)</label><span>+ ${fmtRp(d.tax)}</span></div>` : '';
+  const notesHtml = d.notes ? `<div class="qt-notes"><div class="qt-notes-lbl">Catatan</div><div class="qt-notes-txt">${d.notes.replace(/\n/g,'<br>')}</div></div>` : '';
+  const companyLine = d.clientCompany ? `<div class="qt-party-detail">🏢 ${d.clientCompany}</div>` : '';
+
+  document.getElementById('qtPreview').innerHTML = `
+    <div class="qt-hdr">
+      <div>
+        ${logoHtml}
+        <div class="qt-company">${d.bizName}</div>
+        ${d.bizTagline?`<div class="qt-company-sub">${d.bizTagline}</div>`:''}
+        ${d.bizPhone?`<div class="qt-company-sub">📞 ${d.bizPhone}</div>`:''}
+        ${d.bizEmail?`<div class="qt-company-sub">✉️ ${d.bizEmail}</div>`:''}
+        ${d.bizAddr?`<div class="qt-company-sub">📍 ${d.bizAddr.replace(/\n/g,', ')}</div>`:''}
+      </div>
+      <div class="qt-title-area">
+        <div class="qt-title">QUOTATION</div>
+        <div class="qt-subtitle">SURAT PENAWARAN HARGA</div>
+        <div class="qt-num"># ${d.qtNumber}</div>
+        <div class="qt-num">Dibuat: ${fmtDate(d.qtDate)}</div>
+      </div>
+    </div>
+    <div class="qt-status-bar ${d.status}">
+      <span>${STATUS_LABEL[d.status]||d.status}</span>
+      <span>—</span>
+      <span>${STATUS_MSG[d.status]||''}</span>
+    </div>
+    <div class="qt-body">
+      <div class="qt-parties">
+        <div>
+          <div class="qt-party-lbl">Dari</div>
+          <div class="qt-party-name">${d.bizName}</div>
+          ${d.bizAddr?`<div class="qt-party-detail">${d.bizAddr.replace(/\n/g,'<br>')}</div>`:''}
+        </div>
+        <div>
+          <div class="qt-party-lbl">Ditujukan Kepada</div>
+          <div class="qt-party-name">${d.clientName}</div>
+          ${companyLine}
+          ${d.clientPhone?`<div class="qt-party-detail">📞 ${d.clientPhone}</div>`:''}
+          ${d.clientEmail?`<div class="qt-party-detail">✉️ ${d.clientEmail}</div>`:''}
+          ${d.clientAddr?`<div class="qt-party-detail">${d.clientAddr.replace(/\n/g,'<br>')}</div>`:''}
+        </div>
+      </div>
+      ${d.qtValid?`<div class="validity-box">⏰ Penawaran berlaku hingga: <strong>${fmtDate(d.qtValid)}</strong></div>`:''}
+      <table class="qt-table">
+        <thead><tr>
+          <th>Item</th><th>Jenis</th><th>Keterangan</th>
+          <th style="text-align:center">Qty</th>
+          <th style="text-align:right">Harga</th>
+          <th style="text-align:right">Subtotal</th>
+        </tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+      <div class="qt-totals">
+        <div class="qt-totals-box">
+          <div class="qt-tot-row"><label>Subtotal</label><span>${fmtRp(d.sub)}</span></div>
+          ${discRow}${taxRow}
+          <div class="qt-tot-grand"><label>TOTAL PENAWARAN</label><span>${fmtRp(d.grand)}</span></div>
+        </div>
+      </div>
+      ${notesHtml}
+      <div class="sign-area">
+        <div class="sign-box">
+          <div class="sign-lbl">Dibuat Oleh</div>
+          <div class="sign-canvas-wrap"><canvas class="sign-canvas" id="signBiz" width="200" height="70"></canvas></div>
+          <div class="sign-line">${d.bizName}</div>
+        </div>
+        <div class="sign-box">
+          <div class="sign-lbl">Disetujui Oleh</div>
+          <div class="sign-canvas-wrap"><canvas class="sign-canvas" id="signClient" width="200" height="70"></canvas></div>
+          <div class="sign-line">${d.clientName}</div>
+        </div>
+      </div>
+    </div>
+    <div class="qt-footer">
+      <div class="qt-footer-txt">Dokumen ini adalah penawaran resmi dari ${d.bizName} • Berlaku hingga ${fmtDate(d.qtValid)||'—'}</div>
+    </div>
+  `;
+  initSignature('signBiz');
+  initSignature('signClient');
+}
+
+// ── SIGNATURE PAD ──
+function initSignature(canvasId){
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+  let lastX=0, lastY=0;
+
+  function getPos(e){
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width/rect.width;
+    const scaleY = canvas.height/rect.height;
+    if(e.touches){
+      return {x:(e.touches[0].clientX-rect.left)*scaleX, y:(e.touches[0].clientY-rect.top)*scaleY};
+    }
+    return {x:(e.clientX-rect.left)*scaleX, y:(e.clientY-rect.top)*scaleY};
+  }
+
+  function start(e){ e.preventDefault(); drawing=true; const p=getPos(e); lastX=p.x; lastY=p.y; }
+  function draw(e){
+    if(!drawing) return; e.preventDefault();
+    const p=getPos(e);
+    ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(p.x,p.y);
+    ctx.strokeStyle='#1a1a2e'; ctx.lineWidth=2; ctx.lineCap='round'; ctx.stroke();
+    lastX=p.x; lastY=p.y;
+  }
+  function stop(){ drawing=false; }
+
+  canvas.addEventListener('mousedown',start);
+  canvas.addEventListener('mousemove',draw);
+  canvas.addEventListener('mouseup',stop);
+  canvas.addEventListener('mouseleave',stop);
+  canvas.addEventListener('touchstart',start,{passive:false});
+  canvas.addEventListener('touchmove',draw,{passive:false});
+  canvas.addEventListener('touchend',stop);
+
+  // Clear button
+  const wrap = canvas.parentElement;
+  if(!wrap.querySelector('.clear-sign')){
+    const clr = document.createElement('button');
+    clr.textContent='✕ Hapus';
+    clr.style.cssText='font-size:.6rem;background:none;border:none;color:#aaa;cursor:pointer;display:block;margin:2px auto 0;';
+    clr.onclick = ()=> ctx.clearRect(0,0,canvas.width,canvas.height);
+    clr.className='clear-sign';
+    wrap.appendChild(clr);
+  }
+}
+
+// ══════════════════════
+// SAVE
+// ══════════════════════
+function saveQt(){
+  generatePreview();
+  const d = collectData();
+  const idx = quotations.findIndex(q=>q.id===d.id);
+  if(idx>=0) quotations[idx]=d; else quotations.unshift(d);
+  localStorage.setItem('quotations',JSON.stringify(quotations));
+  const btn = event.target;
+  const orig = btn.innerHTML;
+  btn.innerHTML='✅ Tersimpan!';
+  setTimeout(()=>{ btn.innerHTML=orig; },1800);
+  renderHistory();
+}
+
+// ══════════════════════
+// HISTORY
+// ══════════════════════
+function renderHistory(){
+  const el = document.getElementById('historyList');
+  if(!quotations.length){
+    el.innerHTML=`<div class="history-empty"><span>📋</span>Belum ada quotation tersimpan</div>`;
+    return;
+  }
+  el.innerHTML = quotations.map(q=>`
+    <div class="qt-list-item" onclick="loadQt(${q.id})">
+      <div class="qt-list-num">${q.qtNumber}</div>
+      <div style="flex:1">
+        <div class="qt-list-client">${q.clientName}${q.clientCompany?` · <span style="font-size:.75rem;color:var(--muted)">${q.clientCompany}</span>`:''}</div>
+        <div class="qt-list-date">${q.savedAt} · Berlaku: ${fmtDate(q.qtValid)}</div>
+      </div>
+      <span class="sbadge sbadge-${q.status}">${STATUS_LABEL[q.status]||q.status}</span>
+      <div class="qt-list-amount">${fmtRp(q.grand)}</div>
+      <div class="qt-list-actions" onclick="event.stopPropagation()">
+        <button class="btn btn-gold" style="padding:5px 10px;font-size:.72rem" onclick="convertFromHistory(${q.id})">🧾</button>
+        <button class="btn btn-danger" style="padding:5px 9px;font-size:.72rem" onclick="deleteQt(${q.id})">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function loadQt(id){
+  const q = quotations.find(x=>x.id===id); if(!q) return;
+  editingId = q.id;
+  document.getElementById('bizName').value    = q.bizName||'';
+  document.getElementById('bizTagline').value = q.bizTagline||'';
+  document.getElementById('bizPhone').value   = q.bizPhone||'';
+  document.getElementById('bizEmail').value   = q.bizEmail||'';
+  document.getElementById('bizAddr').value    = q.bizAddr||'';
+  document.getElementById('qtNumber').value   = q.qtNumber||'';
+  document.getElementById('qtDate').value     = q.qtDate||'';
+  document.getElementById('qtValid').value    = q.qtValid||'';
+  document.getElementById('qtStatus').value   = q.status||'draft';
+  document.getElementById('clientName').value    = q.clientName||'';
+  document.getElementById('clientPhone').value   = q.clientPhone||'';
+  document.getElementById('clientEmail').value   = q.clientEmail||'';
+  document.getElementById('clientCompany').value = q.clientCompany||'';
+  document.getElementById('clientAddr').value    = q.clientAddr||'';
+  document.getElementById('qtNotes').value   = q.notes||'';
+  document.getElementById('discPct').value   = q.dp||0;
+  document.getElementById('taxPct').value    = q.tp||0;
+  updateStatusStyle();
+  if(q.logo){ logoUrl=q.logo; document.getElementById('logoImg').src=q.logo; document.getElementById('logoImg').style.display='block'; document.getElementById('logoPh').style.display='none'; }
+  items = (q.items||[]).map(i=>({...i,id:i.id||Date.now()+Math.random()}));
+  renderItems();
+  switchTab('buat', document.querySelectorAll('.tab')[0]);
+}
+
+function deleteQt(id){
+  showConfirm('Hapus Quotation','Quotation ini akan dihapus permanen.',()=>{
+    quotations = quotations.filter(q=>q.id!==id);
+    localStorage.setItem('quotations',JSON.stringify(quotations));
+    renderHistory();
+  });
+}
+
+function clearAll(){
+  showConfirm('Hapus Semua','Semua quotation akan dihapus permanen!',()=>{
+    quotations=[];
+    localStorage.setItem('quotations',JSON.stringify(quotations));
+    renderHistory();
+  });
+}
+
+// ══════════════════════
+// CONVERT TO INVOICE
+// ══════════════════════
+function convertToInvoice(){
+  generatePreview();
+  convertData = collectData();
+  openConvertModal(convertData);
+}
+
+function convertFromHistory(id){
+  const q = quotations.find(x=>x.id===id); if(!q) return;
+  convertData = q;
+  openConvertModal(q);
+}
+
+function openConvertModal(d){
+  const invs = getInvoices();
+  const nextNum = (invs.length+1).toString().padStart(3,'0');
+  document.getElementById('newInvNum').value = `INV-${nextNum}`;
+  const today = new Date().toISOString().split('T')[0];
+  const due = new Date(); due.setDate(due.getDate()+7);
+  document.getElementById('newInvDate').value = today;
+  document.getElementById('newInvDue').value  = due.toISOString().split('T')[0];
+
+  document.getElementById('convertInfo').innerHTML = `
+    <div><label>Quotation</label><span>${d.qtNumber}</span></div>
+    <div><label>Pelanggan</label><span>${d.clientName}</span></div>
+    <div><label>Total</label><span style="color:var(--gold);font-weight:700">${fmtRp(d.grand)}</span></div>
+    <div><label>Item</label><span>${(d.items||[]).length} item</span></div>
+  `;
+  document.getElementById('convertModal').classList.add('show');
+}
+
+function doConvert(){
+  if(!convertData) return;
+  const d = convertData;
+  const inv = {
+    id: Date.now(),
+    invNumber: document.getElementById('newInvNum').value || 'INV-001',
+    invDate:   document.getElementById('newInvDate').value,
+    invDue:    document.getElementById('newInvDue').value,
+    bizName:   d.bizName, bizTagline:d.bizTagline, bizPhone:d.bizPhone,
+    bizEmail:  d.bizEmail, bizAddress:d.bizAddr,
+    clientName:d.clientName, clientPhone:d.clientPhone, clientAddress:d.clientAddr,
+    notes: d.notes, discountPct:d.dp, taxPct:d.tp,
+    items: d.items, logo:d.logo,
+    subtotal:d.sub, disc:d.disc, tax:d.tax, grand:d.grand,
+    status:'unpaid',
+    fromQuotation: d.qtNumber,
+    savedAt: new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
+  };
+  const invs = getInvoices();
+  invs.unshift(inv);
+  saveInvoices(invs);
+
+  // Update quotation status to approved if it was sent
+  const qIdx = quotations.findIndex(q=>q.id===d.id);
+  if(qIdx>=0 && quotations[qIdx].status==='sent'){
+    quotations[qIdx].status='approved';
+    localStorage.setItem('quotations',JSON.stringify(quotations));
+  }
+
+  closeModal('convertModal');
+  // Feedback
+  const btn = document.getElementById('convertModal').querySelector('.btn-gold');
+  setTimeout(()=>{
+    alert(`✅ Invoice ${inv.invNumber} berhasil dibuat!\n\nBuka invoice-generator.html untuk melihatnya.`);
+  }, 100);
+  renderHistory();
+}
+
+// ══════════════════════
+// RESET
+// ══════════════════════
+function resetForm(){
+  editingId=null; logoUrl='';
+  ['bizName','bizTagline','bizPhone','bizEmail','bizAddr','clientName','clientPhone','clientEmail','clientCompany','clientAddr','qtNotes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('discPct').value=0;
+  document.getElementById('taxPct').value=0;
+  document.getElementById('qtStatus').value='draft';
+  document.getElementById('logoImg').style.display='none';
+  document.getElementById('logoPh').style.display='';
+  updateStatusStyle();
+  items=[];
+  autoQtNumber();
+  addItem();
+  calcTotals();
+}
+
+// ══════════════════════
+// MODALS
+// ══════════════════════
+let confirmCb = null;
+function showConfirm(title, msg, cb){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalMsg').textContent = msg;
+  confirmCb = cb;
+  document.getElementById('confirmModal').classList.add('show');
+}
+document.getElementById('modalOk').onclick = ()=>{ if(confirmCb) confirmCb(); closeModal('confirmModal'); };
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+</script>
+</body>
+</html>

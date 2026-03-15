@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💼 Portofolio Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Syne:wght@700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f8f9fc; --card:#fff; --card2:#f1f4fb; --border:#e8ecf5;
+  --accent:#4f46e5; --accent2:#7c3aed; --green:#10b981; --amber:#f59e0b;
+  --red:#ef4444; --pink:#ec4899; --cyan:#06b6d4;
+  --text:#0f172a; --text2:#475569; --text3:#94a3b8;
+  --shadow:rgba(79,70,229,.08);
+}
+[data-theme="dark"]{
+  --bg:#0c0e14; --card:#13161f; --card2:#1a1e2a; --border:#2a2e3e;
+  --text:#f0f2f8; --text2:#8b91a8; --text3:#555d78; --shadow:rgba(79,70,229,.2);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:15px;scroll-behavior:smooth;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .25s,color .25s;}
+button{font-family:inherit;cursor:pointer;border:none;outline:none;}
+input,select,textarea{font-family:inherit;outline:none;border:none;background:none;}
+::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+/* ── LAYOUT ── */
+.app{display:flex;min-height:100vh;}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:220px;flex-shrink:0;background:var(--card);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:20px 12px;
+  position:fixed;top:0;left:0;height:100vh;z-index:100;
+  transition:all .25s;
+}
+.logo{display:flex;align-items:center;gap:10px;padding:8px 10px;margin-bottom:28px;}
+.logo-icon{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.95rem;box-shadow:0 4px 12px var(--shadow);
+}
+.logo-name{font-family:'Syne',sans-serif;font-size:1rem;font-weight:900;}
+.logo-sub{font-size:.62rem;color:var(--text3);font-weight:600;letter-spacing:.5px;}
+
+.nav-label{font-size:.6rem;font-weight:800;color:var(--text3);letter-spacing:2px;text-transform:uppercase;padding:0 10px;margin:14px 0 5px;}
+.nav-item{
+  display:flex;align-items:center;gap:9px;padding:8px 10px;
+  border-radius:9px;font-size:.84rem;font-weight:600;
+  color:var(--text2);cursor:pointer;transition:all .15s;margin-bottom:2px;
+}
+.nav-item:hover{background:var(--card2);color:var(--text);}
+.nav-item.active{background:rgba(79,70,229,.1);color:var(--accent);font-weight:800;}
+.nav-item .ico{font-size:.95rem;width:18px;text-align:center;}
+.nav-badge{font-size:.6rem;font-weight:800;padding:1px 7px;border-radius:50px;margin-left:auto;}
+
+.sidebar-footer{margin-top:auto;padding-top:12px;border-top:1px solid var(--border);}
+.theme-btn{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border-radius:9px;background:none;color:var(--text2);font-size:.82rem;font-weight:600;transition:all .15s;}
+.theme-btn:hover{background:var(--card2);color:var(--text);}
+
+/* ── MAIN ── */
+.main{margin-left:220px;flex:1;padding:28px 28px 60px;}
+.page{display:none;}
+.page.active{display:block;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── PAGE HEADER ── */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.page-title{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:900;line-height:1;}
+.page-sub{font-size:.82rem;color:var(--text3);margin-top:4px;}
+
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;position:relative;overflow:hidden;}
+.stat-card::after{content:'';position:absolute;top:-16px;right:-16px;width:60px;height:60px;border-radius:50%;opacity:.08;}
+.sc1::after{background:var(--accent);}
+.sc2::after{background:var(--green);}
+.sc3::after{background:var(--amber);}
+.sc4::after{background:var(--pink);}
+.stat-icon{font-size:1.1rem;margin-bottom:8px;}
+.stat-val{font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:3px;}
+.stat-lbl{font-size:.65rem;font-weight:800;color:var(--text3);letter-spacing:1px;text-transform:uppercase;}
+.stat-sub{font-size:.72rem;color:var(--text2);margin-top:4px;}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px;}
+.card-title{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:900;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:'';display:block;width:3px;height:13px;border-radius:2px;background:linear-gradient(var(--accent),var(--accent2));}
+
+/* ── PROJECT CARDS ── */
+.project-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+.project-card{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:18px;transition:all .2s;position:relative;overflow:hidden;cursor:pointer;
+}
+.project-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px var(--shadow);border-color:rgba(79,70,229,.2);}
+.project-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.pc-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:8px;}
+.pc-name{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:900;line-height:1.2;}
+.pc-client{font-size:.75rem;color:var(--text3);font-weight:600;margin-top:3px;}
+.pc-desc{font-size:.78rem;color:var(--text2);line-height:1.5;margin-bottom:12px;}
+.pc-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.pc-tag{font-size:.6rem;font-weight:800;padding:2px 9px;border-radius:50px;background:var(--card2);color:var(--text3);border:1px solid var(--border);}
+.pc-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+.pc-income{font-family:'Space Mono',monospace;font-size:.85rem;font-weight:700;color:var(--green);}
+.pc-date{font-size:.7rem;color:var(--text3);}
+
+/* ── STATUS BADGE ── */
+.status{display:inline-flex;align-items:center;gap:4px;font-size:.62rem;font-weight:800;padding:3px 10px;border-radius:50px;white-space:nowrap;}
+.s-active{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.25);}
+.s-done{background:rgba(79,70,229,.1);color:var(--accent);border:1px solid rgba(79,70,229,.25);}
+.s-hold{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.25);}
+.s-prospect{background:rgba(6,182,212,.1);color:var(--cyan);border:1px solid rgba(6,182,212,.25);}
+.s-cancel{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);}
+
+/* ── FORM ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-full{grid-column:1/-1;}
+.field label{display:block;font-size:.65rem;font-weight:800;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
+.field input,.field select,.field textarea{
+  width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;
+  padding:9px 13px;color:var(--text);font-size:.86rem;font-weight:500;transition:all .15s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,70,229,.1);}
+.field select option{background:var(--card2);}
+.field textarea{resize:vertical;min-height:70px;}
+
+/* ── BUTTONS ── */
+.btn{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.86rem;border-radius:10px;padding:9px 18px;transition:all .2s;display:inline-flex;align-items:center;gap:6px;letter-spacing:.2px;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 14px var(--shadow);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px var(--shadow);}
+.btn-ghost{background:var(--card2);color:var(--text);border:1px solid var(--border);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.btn-danger{background:rgba(239,68,68,.08);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.btn-danger:hover{background:rgba(239,68,68,.15);}
+.btn-sm{padding:6px 13px;font-size:.76rem;}
+.btn-green{background:linear-gradient(135deg,#059669,var(--green));color:#fff;box-shadow:0 4px 12px rgba(16,185,129,.25);}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;}
+table.tbl{width:100%;border-collapse:collapse;font-size:.82rem;}
+table.tbl th{font-size:.6rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+table.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+table.tbl tr:last-child td{border-bottom:none;}
+table.tbl tr:hover td{background:var(--card2);}
+table.tbl td.mono{font-family:'Space Mono',monospace;font-size:.78rem;}
+table.tbl td.right{text-align:right;}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(15,23,42,.5);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.2);animation:modalIn .25s cubic-bezier(.34,1.56,.64,1);}
+@keyframes modalIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.modal-title{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:900;}
+.modal-close{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text2);font-size:.85rem;transition:all .15s;}
+.modal-close:hover{color:var(--text);}
+
+/* ── SKILLS ── */
+.skills-wrap{display:flex;flex-wrap:wrap;gap:8px;}
+.skill-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:50px;font-size:.76rem;font-weight:700;cursor:pointer;transition:all .15s;}
+.skill-pill.active{color:#fff;}
+
+/* ── INCOME CHART ── */
+.income-bars{display:flex;gap:6px;align-items:flex-end;height:120px;margin-top:10px;}
+.income-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.income-bar{width:100%;border-radius:6px 6px 0 0;transition:height .4s ease;min-height:4px;background:linear-gradient(var(--accent),var(--accent2));}
+.income-bar-lbl{font-size:.58rem;color:var(--text3);font-weight:700;white-space:nowrap;}
+.income-bar-val{font-size:.6rem;font-family:'Space Mono',monospace;color:var(--text2);}
+
+/* ── PROGRESS ── */
+.progress-wrap{background:var(--card2);border-radius:99px;height:6px;overflow:hidden;}
+.progress-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s ease;}
+
+/* ── SHOWCASE ── */
+.showcase-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
+.showcase-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:all .2s;}
+.showcase-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px var(--shadow);}
+.showcase-thumb{height:100px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;}
+.showcase-body{padding:14px;}
+.showcase-name{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:900;margin-bottom:4px;}
+.showcase-client{font-size:.72rem;color:var(--text3);}
+.showcase-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:48px 20px;color:var(--text3);}
+.empty .ico{font-size:2.5rem;margin-bottom:12px;}
+.empty p{font-size:.86rem;line-height:1.7;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;z-index:9999;padding:11px 20px;border-radius:12px;font-size:.82rem;font-weight:700;animation:toastIn .3s ease;box-shadow:0 8px 24px rgba(0,0,0,.15);}
+.toast.success{background:linear-gradient(135deg,#059669,var(--green));color:#fff;}
+.toast.error{background:linear-gradient(135deg,#dc2626,var(--red));color:#fff;}
+.toast.info{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CONFIRM ── */
+.confirm-overlay{position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.5);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;}
+.confirm-box{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:28px;max-width:320px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.2);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .sidebar{width:56px;padding:14px 8px;}
+  .sidebar .logo-name,.sidebar .logo-sub,.nav-item .nav-lbl,.nav-label,.nav-badge,.theme-btn span{display:none;}
+  .nav-item{justify-content:center;padding:10px;}
+  .main{margin-left:56px;padding:20px 14px 60px;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .form-grid{grid-template-columns:1fr;}
+  .project-grid,.showcase-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">💼</div>
+    <div>
+      <div class="logo-name">Porto</div>
+      <div class="logo-sub">Tracker</div>
+    </div>
+  </div>
+
+  <div class="nav-label">Menu</div>
+  <div class="nav-item active" onclick="nav('dashboard',this)"><span class="ico">📊</span><span class="nav-lbl">Dashboard</span></div>
+  <div class="nav-item" onclick="nav('projects',this)"><span class="ico">💼</span><span class="nav-lbl">Project</span><span class="nav-badge" id="navBadgeProject" style="background:rgba(79,70,229,.12);color:var(--accent);">0</span></div>
+  <div class="nav-item" onclick="nav('income',this)"><span class="ico">💰</span><span class="nav-lbl">Pendapatan</span></div>
+  <div class="nav-item" onclick="nav('skills',this)"><span class="ico">⚡</span><span class="nav-lbl">Skills</span></div>
+  <div class="nav-item" onclick="nav('showcase',this)"><span class="ico">🏆</span><span class="nav-lbl">Showcase</span></div>
+  <div class="nav-item" onclick="nav('clients',this)"><span class="ico">👤</span><span class="nav-lbl">Klien</span></div>
+
+  <div class="sidebar-footer">
+    <button class="theme-btn" onclick="toggleTheme()">
+      <span id="themeIco">🌙</span><span>Dark Mode</span>
+    </button>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Dashboard 👋</div>
+      <div class="page-sub" id="dashSub">Ringkasan portofolio kamu</div>
+    </div>
+    <button class="btn btn-primary" onclick="openProjectModal()">＋ Tambah Project</button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card sc1">
+      <div class="stat-icon">💼</div>
+      <div class="stat-val" style="color:var(--accent)" id="statProjects">0</div>
+      <div class="stat-lbl">Total Project</div>
+      <div class="stat-sub" id="statProjectSub">—</div>
+    </div>
+    <div class="stat-card sc2">
+      <div class="stat-icon">💰</div>
+      <div class="stat-val" style="color:var(--green)" id="statIncome">Rp 0</div>
+      <div class="stat-lbl">Total Pendapatan</div>
+      <div class="stat-sub" id="statIncomeSub">—</div>
+    </div>
+    <div class="stat-card sc3">
+      <div class="stat-icon">👤</div>
+      <div class="stat-val" style="color:var(--amber)" id="statClients">0</div>
+      <div class="stat-lbl">Total Klien</div>
+      <div class="stat-sub" id="statClientSub">—</div>
+    </div>
+    <div class="stat-card sc4">
+      <div class="stat-icon">⚡</div>
+      <div class="stat-val" style="color:var(--pink)" id="statSkills">0</div>
+      <div class="stat-lbl">Skills</div>
+      <div class="stat-sub" id="statSkillSub">—</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card">
+      <div class="card-title">💼 Project Aktif</div>
+      <div id="dashActiveProjects"><div class="empty"><div class="ico">💼</div><p>Belum ada project aktif</p></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📅 Deadline Terdekat</div>
+      <div id="dashDeadlines"><div class="empty"><div class="ico">📅</div><p>Tidak ada deadline mendatang</p></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📈 Pendapatan 6 Bulan Terakhir</div>
+    <div class="income-bars" id="dashIncomeChart"></div>
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<div class="page" id="page-projects">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Project 💼</div>
+      <div class="page-sub">Semua project yang pernah kamu kerjakan</div>
+    </div>
+    <button class="btn btn-primary" onclick="openProjectModal()">＋ Tambah Project</button>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+    <button class="btn btn-primary btn-sm" id="pf-all" onclick="filterProjects('all',this)">Semua</button>
+    <button class="btn btn-ghost btn-sm" onclick="filterProjects('active',this)">🟢 Aktif</button>
+    <button class="btn btn-ghost btn-sm" onclick="filterProjects('done',this)">✅ Selesai</button>
+    <button class="btn btn-ghost btn-sm" onclick="filterProjects('hold',this)">⏸ Hold</button>
+    <button class="btn btn-ghost btn-sm" onclick="filterProjects('prospect',this)">🔍 Prospek</button>
+  </div>
+
+  <div class="project-grid" id="projectGrid">
+    <div class="empty" style="grid-column:1/-1"><div class="ico">💼</div><p>Belum ada project.<br>Tambah project pertama kamu!</p></div>
+  </div>
+</div>
+
+<!-- INCOME -->
+<div class="page" id="page-income">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Pendapatan 💰</div>
+      <div class="page-sub">Rekap penghasilan dari semua project</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;">
+    <div class="card" style="margin:0;">
+      <div class="card-title">Bulan Ini</div>
+      <div style="font-family:'Space Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--green)" id="incomeMonth">Rp 0</div>
+    </div>
+    <div class="card" style="margin:0;">
+      <div class="card-title">Tahun Ini</div>
+      <div style="font-family:'Space Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--accent)" id="incomeYear">Rp 0</div>
+    </div>
+    <div class="card" style="margin:0;">
+      <div class="card-title">All Time</div>
+      <div style="font-family:'Space Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--amber)" id="incomeAll">Rp 0</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📅 Per Bulan</div>
+    <div class="income-bars" id="incomeChart" style="height:160px;"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">💼 Per Project</div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>Project</th><th>Klien</th><th>Kategori</th><th>Selesai</th><th class="right">Pendapatan</th><th>Mata Uang</th></tr></thead>
+        <tbody id="incomeTable"></tbody>
+      </table>
+    </div>
+    <div id="incomeEmpty" class="empty" style="display:none;"><div class="ico">💰</div><p>Belum ada data pendapatan</p></div>
+  </div>
+</div>
+
+<!-- SKILLS -->
+<div class="page" id="page-skills">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Skills ⚡</div>
+      <div class="page-sub">Skill yang kamu kuasai & paling sering dipakai</div>
+    </div>
+    <button class="btn btn-primary" onclick="openSkillModal()">＋ Tambah Skill</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card">
+      <div class="card-title">⚡ Semua Skills</div>
+      <div class="skills-wrap" id="skillsList"><div class="empty"><div class="ico">⚡</div><p>Belum ada skill</p></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏆 Top Skills (dari Project)</div>
+      <div id="topSkillsList"><div class="empty"><div class="ico">📊</div><p>Tambah skill di project untuk melihat statistik</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SHOWCASE -->
+<div class="page" id="page-showcase">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Showcase 🏆</div>
+      <div class="page-sub">Project terbaik untuk portofolio kamu</div>
+    </div>
+  </div>
+
+  <div class="showcase-grid" id="showcaseGrid">
+    <div class="empty" style="grid-column:1/-1"><div class="ico">🏆</div><p>Tandai project sebagai showcase<br>dari halaman Project</p></div>
+  </div>
+</div>
+
+<!-- CLIENTS -->
+<div class="page" id="page-clients">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Klien 👤</div>
+      <div class="page-sub">Semua klien yang pernah bekerja sama</div>
+    </div>
+    <button class="btn btn-primary" onclick="openClientModal()">＋ Tambah Klien</button>
+  </div>
+
+  <div class="card">
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>Nama</th><th>Perusahaan</th><th>Kontak</th><th>Project</th><th class="right">Total Nilai</th><th></th></tr></thead>
+        <tbody id="clientsTable"></tbody>
+      </table>
+    </div>
+    <div id="clientsEmpty" class="empty"><div class="ico">👤</div><p>Belum ada klien</p></div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- MODAL: PROJECT -->
+<div class="modal-overlay" id="projectModal">
+  <div class="modal" style="max-width:580px;">
+    <div class="modal-header">
+      <div class="modal-title" id="projectModalTitle">💼 Tambah Project</div>
+      <button class="modal-close" onclick="closeModal('projectModal')">✕</button>
+    </div>
+    <input type="hidden" id="projectId">
+    <div class="form-grid">
+      <div class="field form-full"><label>Nama Project *</label><input type="text" id="pName" placeholder="cth: Website Redesign, Social Media Management"></div>
+      <div class="field"><label>Klien *</label><input type="text" id="pClient" placeholder="Nama klien / perusahaan"></div>
+      <div class="field"><label>Kategori</label>
+        <select id="pCategory">
+          <option value="web">🌐 Web Development</option>
+          <option value="design">🎨 Design</option>
+          <option value="content">✍️ Content Writing</option>
+          <option value="social">📱 Social Media</option>
+          <option value="video">🎬 Video</option>
+          <option value="marketing">📣 Marketing</option>
+          <option value="va">💼 Virtual Assistant</option>
+          <option value="consulting">🧠 Consulting</option>
+          <option value="lainnya">📌 Lainnya</option>
+        </select>
+      </div>
+      <div class="field"><label>Status</label>
+        <select id="pStatus">
+          <option value="prospect">🔍 Prospek</option>
+          <option value="active">🟢 Aktif</option>
+          <option value="hold">⏸ Hold</option>
+          <option value="done">✅ Selesai</option>
+          <option value="cancel">❌ Dibatalkan</option>
+        </select>
+      </div>
+      <div class="field"><label>Nilai Project</label><input type="number" id="pIncome" placeholder="0" min="0"></div>
+      <div class="field"><label>Mata Uang</label>
+        <select id="pCurrency">
+          <option value="IDR">🇮🇩 IDR</option>
+          <option value="USD">🇺🇸 USD</option>
+          <option value="SGD">🇸🇬 SGD</option>
+          <option value="MYR">🇲🇾 MYR</option>
+          <option value="AUD">🇦🇺 AUD</option>
+          <option value="EUR">🇪🇺 EUR</option>
+        </select>
+      </div>
+      <div class="field"><label>Tanggal Mulai</label><input type="date" id="pStartDate"></div>
+      <div class="field"><label>Deadline / Selesai</label><input type="date" id="pEndDate"></div>
+      <div class="field form-full"><label>Skills yang Dipakai</label><input type="text" id="pSkills" placeholder="cth: Figma, WordPress, Canva (pisah dengan koma)"></div>
+      <div class="field form-full"><label>Deskripsi</label><textarea id="pDesc" placeholder="Deskripsi project, deliverable, catatan penting..."></textarea></div>
+      <div class="field form-full"><label>Link Project / Portfolio</label><input type="text" id="pLink" placeholder="https://..."></div>
+      <div class="field form-full">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;font-size:.82rem;">
+          <input type="checkbox" id="pShowcase" style="accent-color:var(--accent);width:15px;height:15px;">
+          🏆 Tampilkan di Showcase (project terbaik)
+        </label>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px;">
+      <button class="btn btn-primary" onclick="saveProject()" style="flex:1">💾 Simpan</button>
+      <button class="btn btn-ghost" onclick="closeModal('projectModal')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: SKILL -->
+<div class="modal-overlay" id="skillModal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <div class="modal-title">⚡ Tambah Skill</div>
+      <button class="modal-close" onclick="closeModal('skillModal')">✕</button>
+    </div>
+    <input type="hidden" id="skillId">
+    <div class="form-grid">
+      <div class="field form-full"><label>Nama Skill *</label><input type="text" id="sName" placeholder="cth: Figma, WordPress, Copywriting"></div>
+      <div class="field"><label>Level</label>
+        <select id="sLevel">
+          <option value="beginner">🌱 Beginner</option>
+          <option value="intermediate">⚡ Intermediate</option>
+          <option value="advanced">🔥 Advanced</option>
+          <option value="expert">👑 Expert</option>
+        </select>
+      </div>
+      <div class="field"><label>Kategori</label>
+        <select id="sCategory">
+          <option value="design">🎨 Design</option>
+          <option value="dev">💻 Development</option>
+          <option value="marketing">📣 Marketing</option>
+          <option value="writing">✍️ Writing</option>
+          <option value="tools">🛠️ Tools</option>
+          <option value="soft">🧠 Soft Skills</option>
+          <option value="lainnya">📌 Lainnya</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button class="btn btn-primary" onclick="saveSkill()" style="flex:1">💾 Simpan</button>
+      <button class="btn btn-ghost" onclick="closeModal('skillModal')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CLIENT -->
+<div class="modal-overlay" id="clientModal">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title" id="clientModalTitle">👤 Tambah Klien</div>
+      <button class="modal-close" onclick="closeModal('clientModal')">✕</button>
+    </div>
+    <input type="hidden" id="clientId">
+    <div class="form-grid">
+      <div class="field form-full"><label>Nama Klien *</label><input type="text" id="cName" placeholder="Nama klien"></div>
+      <div class="field"><label>Perusahaan</label><input type="text" id="cCompany" placeholder="Nama perusahaan"></div>
+      <div class="field"><label>Email</label><input type="email" id="cEmail" placeholder="email@domain.com"></div>
+      <div class="field"><label>WhatsApp</label><input type="text" id="cWA" placeholder="+62..."></div>
+      <div class="field"><label>Negara</label>
+        <select id="cCountry">
+          <option value="Indonesia">🇮🇩 Indonesia</option>
+          <option value="Singapore">🇸🇬 Singapore</option>
+          <option value="Malaysia">🇲🇾 Malaysia</option>
+          <option value="Australia">🇦🇺 Australia</option>
+          <option value="USA">🇺🇸 USA</option>
+          <option value="Lainnya">🌍 Lainnya</option>
+        </select>
+      </div>
+      <div class="field"><label>Platform Ketemu</label><input type="text" id="cPlatform" placeholder="cth: Upwork, LinkedIn, Referral"></div>
+      <div class="field form-full"><label>Catatan</label><textarea id="cNotes" placeholder="Karakter klien, preferensi, dll" style="min-height:50px;"></textarea></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button class="btn btn-primary" onclick="saveClient()" style="flex:1">💾 Simpan</button>
+      <button class="btn btn-ghost" onclick="closeModal('clientModal')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════
+// DATA
+// ═══════════════════
+const KEY = { projects:'porto_projects', skills:'porto_skills', clients:'porto_clients' };
+const load = k=>{ try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return[];} };
+const save = (k,v)=>localStorage.setItem(k,JSON.stringify(v));
+
+let projects = load(KEY.projects);
+let skills   = load(KEY.skills);
+let clients  = load(KEY.clients);
+
+const uid = ()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const today = ()=>new Date().toISOString().split('T')[0];
+const fmtDate = d=>d?new Date(d+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}):'—';
+const fmtMoney = (n,cur='IDR')=>{
+  const s={IDR:'Rp ',USD:'$',SGD:'S$',MYR:'RM ',AUD:'A$',EUR:'€'};
+  if(cur==='IDR') return (s[cur]||cur+' ')+Math.round(n||0).toLocaleString('id-ID');
+  return (s[cur]||cur+' ')+(n||0).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2});
+};
+const fmtMoneyShort = (n,cur='IDR')=>{
+  if(cur==='IDR'){
+    if(n>=1e9) return 'Rp '+(n/1e9).toFixed(1)+'M';
+    if(n>=1e6) return 'Rp '+(n/1e6).toFixed(1)+'jt';
+    if(n>=1e3) return 'Rp '+(n/1e3).toFixed(0)+'rb';
+    return 'Rp '+n;
+  }
+  const s={USD:'$',SGD:'S$',MYR:'RM ',AUD:'A$',EUR:'€'};
+  return (s[cur]||cur+' ')+(n||0).toFixed(0);
+};
+
+const catConfig = {
+  web:       {icon:'🌐',label:'Web Dev',color:'#4f46e5'},
+  design:    {icon:'🎨',label:'Design',color:'#ec4899'},
+  content:   {icon:'✍️',label:'Content',color:'#f59e0b'},
+  social:    {icon:'📱',label:'Social Media',color:'#06b6d4'},
+  video:     {icon:'🎬',label:'Video',color:'#ef4444'},
+  marketing: {icon:'📣',label:'Marketing',color:'#10b981'},
+  va:        {icon:'💼',label:'VA',color:'#8b5cf6'},
+  consulting:{icon:'🧠',label:'Consulting',color:'#f97316'},
+  lainnya:   {icon:'📌',label:'Lainnya',color:'#64748b'},
+};
+const statusConfig = {
+  active:   {label:'Aktif',cls:'s-active'},
+  done:     {label:'Selesai',cls:'s-done'},
+  hold:     {label:'Hold',cls:'s-hold'},
+  prospect: {label:'Prospek',cls:'s-prospect'},
+  cancel:   {label:'Batal',cls:'s-cancel'},
+};
+const levelConfig = {
+  beginner:     {label:'Beginner',color:'#10b981'},
+  intermediate: {label:'Intermediate',color:'#f59e0b'},
+  advanced:     {label:'Advanced',color:'#ef4444'},
+  expert:       {label:'Expert',color:'#7c3aed'},
+};
+
+// ═══════════════════
+// NAV
+// ═══════════════════
+function nav(page,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if(el) el.classList.add('active');
+  if(page==='dashboard') renderDashboard();
+  if(page==='projects')  renderProjects('all');
+  if(page==='income')    renderIncome();
+  if(page==='skills')    renderSkills();
+  if(page==='showcase')  renderShowcase();
+  if(page==='clients')   renderClients();
+}
+
+// ═══════════════════
+// THEME
+// ═══════════════════
+function toggleTheme(){
+  const dark = document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',dark?'':'dark');
+  document.getElementById('themeIco').textContent = dark?'🌙':'☀️';
+  localStorage.setItem('porto_theme',dark?'':'dark');
+}
+(()=>{ const t=localStorage.getItem('porto_theme'); if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('themeIco').textContent='☀️';} })();
+
+// ═══════════════════
+// PROJECTS
+// ═══════════════════
+function openProjectModal(id){
+  const el = document.getElementById('projectModal');
+  document.getElementById('projectId').value='';
+  ['pName','pClient','pIncome','pStartDate','pEndDate','pSkills','pDesc','pLink'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('pCategory').value='web';
+  document.getElementById('pStatus').value='active';
+  document.getElementById('pCurrency').value='IDR';
+  document.getElementById('pShowcase').checked=false;
+  document.getElementById('projectModalTitle').textContent='💼 Tambah Project';
+  if(id){
+    const p=projects.find(x=>x.id===id);
+    if(p){
+      document.getElementById('projectModalTitle').textContent='✏️ Edit Project';
+      document.getElementById('projectId').value=p.id;
+      document.getElementById('pName').value=p.name||'';
+      document.getElementById('pClient').value=p.client||'';
+      document.getElementById('pCategory').value=p.category||'web';
+      document.getElementById('pStatus').value=p.status||'active';
+      document.getElementById('pIncome').value=p.income||'';
+      document.getElementById('pCurrency').value=p.currency||'IDR';
+      document.getElementById('pStartDate').value=p.startDate||'';
+      document.getElementById('pEndDate').value=p.endDate||'';
+      document.getElementById('pSkills').value=(p.skills||[]).join(', ');
+      document.getElementById('pDesc').value=p.desc||'';
+      document.getElementById('pLink').value=p.link||'';
+      document.getElementById('pShowcase').checked=p.showcase||false;
+    }
+  }
+  el.classList.add('open');
+}
+
+function saveProject(){
+  const name=document.getElementById('pName').value.trim();
+  const client=document.getElementById('pClient').value.trim();
+  if(!name){ toast('Nama project wajib diisi!','error'); return; }
+  if(!client){ toast('Nama klien wajib diisi!','error'); return; }
+  const id=document.getElementById('projectId').value;
+  const skillsRaw=document.getElementById('pSkills').value;
+  const skillsArr=skillsRaw?skillsRaw.split(',').map(s=>s.trim()).filter(Boolean):[];
+  // Auto-add new skills
+  skillsArr.forEach(s=>{ if(!skills.find(x=>x.name.toLowerCase()===s.toLowerCase())){ skills.push({id:uid(),name:s,level:'intermediate',category:'lainnya',createdAt:new Date().toISOString()}); } });
+  save(KEY.skills,skills);
+  const data={
+    id:id||uid(), name, client,
+    category: document.getElementById('pCategory').value,
+    status:   document.getElementById('pStatus').value,
+    income:   parseFloat(document.getElementById('pIncome').value)||0,
+    currency: document.getElementById('pCurrency').value,
+    startDate:document.getElementById('pStartDate').value,
+    endDate:  document.getElementById('pEndDate').value,
+    skills:   skillsArr,
+    desc:     document.getElementById('pDesc').value.trim(),
+    link:     document.getElementById('pLink').value.trim(),
+    showcase: document.getElementById('pShowcase').checked,
+    createdAt:id?projects.find(x=>x.id===id)?.createdAt:new Date().toISOString(),
+  };
+  // Auto-add client
+  if(!clients.find(x=>x.name.toLowerCase()===client.toLowerCase())){
+    clients.push({id:uid(),name:client,company:'',email:'',wa:'',country:'Indonesia',platform:'',notes:'',createdAt:new Date().toISOString()});
+    save(KEY.clients,clients);
+  }
+  if(id) projects=projects.map(p=>p.id===id?data:p);
+  else projects.push(data);
+  save(KEY.projects,projects);
+  closeModal('projectModal');
+  renderProjects(currentProjectFilter);
+  renderDashboard();
+  document.getElementById('navBadgeProject').textContent=projects.length;
+  toast(id?'Project diupdate! 💼':'Project ditambahkan! 🎉','success');
+}
+
+function deleteProject(id){
+  confirmAction('Project ini akan dihapus permanen.',()=>{
+    projects=projects.filter(p=>p.id!==id);
+    save(KEY.projects,projects);
+    renderProjects(currentProjectFilter);
+    renderDashboard();
+    document.getElementById('navBadgeProject').textContent=projects.length;
+    toast('Project dihapus','info');
+  });
+}
+
+let currentProjectFilter='all';
+function filterProjects(filter,el){
+  currentProjectFilter=filter;
+  document.querySelectorAll('#page-projects .btn').forEach(b=>{
+    b.className=b.id==='pf-all'?'btn btn-ghost btn-sm':'btn btn-ghost btn-sm';
+  });
+  if(el){ el.className='btn btn-primary btn-sm'; }
+  renderProjects(filter);
+}
+
+function renderProjects(filter){
+  const grid=document.getElementById('projectGrid');
+  let filtered=projects;
+  if(filter&&filter!=='all') filtered=filtered.filter(p=>p.status===filter);
+  filtered=[...filtered].sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+  if(!filtered.length){
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="ico">💼</div><p>Belum ada project'+( filter!=='all'?' dengan status ini':'')+'</p></div>';
+    return;
+  }
+  grid.innerHTML=filtered.map(p=>{
+    const cat=catConfig[p.category]||catConfig.lainnya;
+    const st=statusConfig[p.status]||statusConfig.active;
+    const daysLeft=p.endDate?Math.ceil((new Date(p.endDate)-new Date())/86400000):null;
+    return `<div class="project-card" style="--card-color:${cat.color}">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${cat.color};border-radius:14px 14px 0 0;"></div>
+      <div class="pc-header">
+        <div>
+          <div class="pc-name">${p.name}</div>
+          <div class="pc-client">${cat.icon} ${cat.label} · ${p.client}</div>
+        </div>
+        <span class="status ${st.cls}">${st.label}</span>
+      </div>
+      ${p.desc?`<div class="pc-desc">${p.desc.slice(0,80)}${p.desc.length>80?'...':''}</div>`:''}
+      ${p.skills?.length?`<div class="pc-tags">${p.skills.slice(0,4).map(s=>`<span class="pc-tag">${s}</span>`).join('')}${p.skills.length>4?`<span class="pc-tag">+${p.skills.length-4}</span>`:''}</div>`:''}
+      <div class="pc-footer">
+        <div>
+          ${p.income>0?`<div class="pc-income">${fmtMoneyShort(p.income,p.currency)}</div>`:''}
+          <div class="pc-date">${p.endDate?fmtDate(p.endDate):'Tanpa deadline'}</div>
+        </div>
+        <div style="display:flex;gap:5px;align-items:center;">
+          ${daysLeft!==null&&daysLeft>=0&&p.status!=='done'?`<span style="font-size:.65rem;font-weight:800;color:${daysLeft<=3?'var(--red)':daysLeft<=7?'var(--amber)':'var(--green)'};">${daysLeft===0?'Hari ini!':daysLeft+'h lagi'}</span>`:''}
+          ${p.showcase?'<span title="Showcase">🏆</span>':''}
+          <button class="btn btn-ghost btn-sm" style="padding:4px 9px;" data-pid="${p.id}" data-paction="edit">✏️</button>
+          <button class="btn btn-danger btn-sm" style="padding:4px 9px;" data-pid="${p.id}" data-paction="del">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════
+// INCOME
+// ═══════════════════
+function renderIncome(){
+  const now=new Date();
+  const thisMonth=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const thisYear=`${now.getFullYear()}`;
+  const doneProjects=projects.filter(p=>p.status==='done'&&p.income>0);
+
+  const toIDR=(n,cur)=>cur==='IDR'?n:n*(cur==='USD'?15000:cur==='SGD'?11000:cur==='MYR'?3200:cur==='AUD'?10000:cur==='EUR'?16000:1);
+  const monthIncome=doneProjects.filter(p=>p.endDate?.startsWith(thisMonth)).reduce((s,p)=>s+toIDR(p.income,p.currency),0);
+  const yearIncome=doneProjects.filter(p=>p.endDate?.startsWith(thisYear)).reduce((s,p)=>s+toIDR(p.income,p.currency),0);
+  const allIncome=doneProjects.reduce((s,p)=>s+toIDR(p.income,p.currency),0);
+
+  document.getElementById('incomeMonth').textContent=fmtMoneyShort(monthIncome);
+  document.getElementById('incomeYear').textContent=fmtMoneyShort(yearIncome);
+  document.getElementById('incomeAll').textContent=fmtMoneyShort(allIncome);
+
+  // Chart 12 bulan
+  renderIncomeChart('incomeChart',12);
+
+  // Table
+  const tbody=document.getElementById('incomeTable');
+  const empty=document.getElementById('incomeEmpty');
+  if(!doneProjects.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML=[...doneProjects].sort((a,b)=>(b.endDate||'').localeCompare(a.endDate||'')).map(p=>{
+    const cat=catConfig[p.category]||catConfig.lainnya;
+    return `<tr>
+      <td><strong>${p.name}</strong>${p.link?` <a href="${p.link}" target="_blank" style="font-size:.7rem;color:var(--accent);margin-left:4px;">↗</a>`:''}</td>
+      <td>${p.client}</td>
+      <td><span style="font-size:.7rem;">${cat.icon} ${cat.label}</span></td>
+      <td>${fmtDate(p.endDate)}</td>
+      <td class="mono right" style="color:var(--green);">${fmtMoney(p.income,p.currency)}</td>
+      <td><span style="font-size:.7rem;font-weight:700;">${p.currency}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderIncomeChart(containerId, months){
+  const container=document.getElementById(containerId);
+  if(!container) return;
+  const now=new Date();
+  const data=[];
+  for(let i=months-1;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const lbl=d.toLocaleDateString('id-ID',{month:'short'});
+    const toIDR=(n,cur)=>cur==='IDR'?n:n*(cur==='USD'?15000:cur==='SGD'?11000:cur==='MYR'?3200:cur==='AUD'?10000:cur==='EUR'?16000:1);
+    const val=projects.filter(p=>p.status==='done'&&p.income>0&&p.endDate?.startsWith(key)).reduce((s,p)=>s+toIDR(p.income,p.currency),0);
+    data.push({lbl,val,key});
+  }
+  const max=Math.max(...data.map(d=>d.val),1);
+  container.innerHTML=data.map(d=>`
+    <div class="income-bar-wrap">
+      <div class="income-bar-val">${d.val>0?fmtMoneyShort(d.val):''}</div>
+      <div class="income-bar" style="height:${Math.max(d.val/max*100,d.val>0?8:2)}%;opacity:${d.val>0?1:0.2};"></div>
+      <div class="income-bar-lbl">${d.lbl}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════
+// SKILLS
+// ═══════════════════
+function openSkillModal(id){
+  document.getElementById('skillId').value='';
+  document.getElementById('sName').value='';
+  document.getElementById('sLevel').value='intermediate';
+  document.getElementById('sCategory').value='design';
+  if(id){
+    const s=skills.find(x=>x.id===id);
+    if(s){
+      document.getElementById('skillId').value=s.id;
+      document.getElementById('sName').value=s.name;
+      document.getElementById('sLevel').value=s.level||'intermediate';
+      document.getElementById('sCategory').value=s.category||'design';
+    }
+  }
+  document.getElementById('skillModal').classList.add('open');
+}
+
+function saveSkill(){
+  const name=document.getElementById('sName').value.trim();
+  if(!name){ toast('Nama skill wajib diisi!','error'); return; }
+  const id=document.getElementById('skillId').value;
+  const data={id:id||uid(),name,level:document.getElementById('sLevel').value,category:document.getElementById('sCategory').value,createdAt:id?skills.find(x=>x.id===id)?.createdAt:new Date().toISOString()};
+  if(id) skills=skills.map(s=>s.id===id?data:s);
+  else skills.push(data);
+  save(KEY.skills,skills);
+  closeModal('skillModal');
+  renderSkills();
+  toast(id?'Skill diupdate!':'Skill ditambahkan! ⚡','success');
+}
+
+function deleteSkill(id){
+  confirmAction('Skill ini akan dihapus.',()=>{
+    skills=skills.filter(s=>s.id!==id);
+    save(KEY.skills,skills);
+    renderSkills();
+    toast('Skill dihapus','info');
+  });
+}
+
+function renderSkills(){
+  const list=document.getElementById('skillsList');
+  if(!skills.length){ list.innerHTML='<div class="empty"><div class="ico">⚡</div><p>Belum ada skill</p></div>'; }
+  else {
+    list.innerHTML=skills.map(s=>{
+      const lc=levelConfig[s.level]||levelConfig.intermediate;
+      return `<div class="skill-pill active" style="background:${lc.color}22;color:${lc.color};border:1.5px solid ${lc.color}44;">
+        ${s.name}
+        <span style="font-size:.6rem;opacity:.7;">${lc.label}</span>
+        <span data-sk="${s.id}" data-ska="edit" style="cursor:pointer;margin-left:2px;font-size:.75rem;">✏️</span>
+        <span data-sk="${s.id}" data-ska="del" style="cursor:pointer;font-size:.75rem;">✕</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Top skills from projects
+  const skillCount={};
+  projects.forEach(p=>(p.skills||[]).forEach(s=>{ skillCount[s]=(skillCount[s]||0)+1; }));
+  const sorted=Object.entries(skillCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const topEl=document.getElementById('topSkillsList');
+  if(!sorted.length){ topEl.innerHTML='<div class="empty"><div class="ico">📊</div><p>Tambah skills di project untuk melihat statistik</p></div>'; }
+  else {
+    const max=sorted[0][1];
+    topEl.innerHTML=sorted.map(([name,count])=>`
+      <div style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:4px;">
+          <strong>${name}</strong><span style="color:var(--text3);">${count} project</span>
+        </div>
+        <div class="progress-wrap"><div class="progress-bar" style="width:${Math.round(count/max*100)}%;"></div></div>
+      </div>`).join('');
+  }
+}
+
+// ═══════════════════
+// SHOWCASE
+// ═══════════════════
+function renderShowcase(){
+  const grid=document.getElementById('showcaseGrid');
+  const showcased=projects.filter(p=>p.showcase);
+  if(!showcased.length){ grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="ico">🏆</div><p>Tandai project sebagai showcase<br>dari halaman Project</p></div>'; return; }
+  grid.innerHTML=showcased.map(p=>{
+    const cat=catConfig[p.category]||catConfig.lainnya;
+    return `<div class="showcase-card">
+      <div class="showcase-thumb" style="background:${cat.color}18;">${cat.icon}</div>
+      <div class="showcase-body">
+        <div class="showcase-name">${p.name}</div>
+        <div class="showcase-client">${p.client}</div>
+        ${p.desc?`<div style="font-size:.75rem;color:var(--text2);margin-top:6px;line-height:1.5;">${p.desc.slice(0,100)}${p.desc.length>100?'...':''}</div>`:''}
+        <div class="showcase-tags">${(p.skills||[]).slice(0,3).map(s=>`<span class="pc-tag">${s}</span>`).join('')}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+          ${p.income>0?`<span style="font-family:'Space Mono',monospace;font-size:.8rem;font-weight:700;color:var(--green);">${fmtMoneyShort(p.income,p.currency)}</span>`:'<span></span>'}
+          ${p.link?`<a href="${p.link}" target="_blank" class="btn btn-ghost btn-sm" style="padding:4px 10px;font-size:.72rem;">↗ Lihat</a>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════
+// CLIENTS
+// ═══════════════════
+function openClientModal(id){
+  document.getElementById('clientId').value='';
+  ['cName','cCompany','cEmail','cWA','cNotes','cPlatform'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('cCountry').value='Indonesia';
+  document.getElementById('clientModalTitle').textContent='👤 Tambah Klien';
+  if(id){
+    const c=clients.find(x=>x.id===id);
+    if(c){
+      document.getElementById('clientModalTitle').textContent='✏️ Edit Klien';
+      document.getElementById('clientId').value=c.id;
+      document.getElementById('cName').value=c.name||'';
+      document.getElementById('cCompany').value=c.company||'';
+      document.getElementById('cEmail').value=c.email||'';
+      document.getElementById('cWA').value=c.wa||'';
+      document.getElementById('cCountry').value=c.country||'Indonesia';
+      document.getElementById('cPlatform').value=c.platform||'';
+      document.getElementById('cNotes').value=c.notes||'';
+    }
+  }
+  document.getElementById('clientModal').classList.add('open');
+}
+
+function saveClient(){
+  const name=document.getElementById('cName').value.trim();
+  if(!name){ toast('Nama klien wajib diisi!','error'); return; }
+  const id=document.getElementById('clientId').value;
+  const data={id:id||uid(),name,company:document.getElementById('cCompany').value.trim(),email:document.getElementById('cEmail').value.trim(),wa:document.getElementById('cWA').value.trim(),country:document.getElementById('cCountry').value,platform:document.getElementById('cPlatform').value.trim(),notes:document.getElementById('cNotes').value.trim(),createdAt:id?clients.find(x=>x.id===id)?.createdAt:new Date().toISOString()};
+  if(id) clients=clients.map(c=>c.id===id?data:c);
+  else clients.push(data);
+  save(KEY.clients,clients);
+  closeModal('clientModal');
+  renderClients();
+  toast(id?'Klien diupdate!':'Klien ditambahkan! 👤','success');
+}
+
+function deleteClient(id){
+  confirmAction('Klien ini akan dihapus.',()=>{
+    clients=clients.filter(c=>c.id!==id);
+    save(KEY.clients,clients);
+    renderClients();
+    toast('Klien dihapus','info');
+  });
+}
+
+function renderClients(){
+  const tbody=document.getElementById('clientsTable');
+  const empty=document.getElementById('clientsEmpty');
+  if(!clients.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  const toIDR=(n,cur)=>cur==='IDR'?n:n*(cur==='USD'?15000:cur==='SGD'?11000:cur==='MYR'?3200:cur==='AUD'?10000:cur==='EUR'?16000:1);
+  tbody.innerHTML=clients.map(c=>{
+    const cProjects=projects.filter(p=>p.client.toLowerCase()===c.name.toLowerCase());
+    const total=cProjects.filter(p=>p.status==='done').reduce((s,p)=>s+toIDR(p.income,p.currency),0);
+    return `<tr>
+      <td><strong>${c.name}</strong>${c.platform?`<div style="font-size:.7rem;color:var(--text3);">${c.platform}</div>`:''}</td>
+      <td>${c.company||'—'}</td>
+      <td>${c.wa?`<a href="https://wa.me/${c.wa.replace(/\D/g,'')}" target="_blank" style="color:var(--green);font-size:.78rem;">💬 WA</a>`:c.email?`<span style="font-size:.78rem;">${c.email}</span>`:'—'}</td>
+      <td>${cProjects.length} project</td>
+      <td class="mono right" style="color:var(--green);">${total>0?fmtMoneyShort(total):'—'}</td>
+      <td><div style="display:flex;gap:5px;">
+        <button class="btn btn-ghost btn-sm" style="padding:4px 8px;" data-cid="${c.id}" data-caction="edit">✏️</button>
+        <button class="btn btn-danger btn-sm" style="padding:4px 8px;" data-cid="${c.id}" data-caction="del">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════
+// DASHBOARD
+// ═══════════════════
+function renderDashboard(){
+  const now=new Date();
+  document.getElementById('dashSub').textContent=`Hai! Kamu punya ${projects.length} project dari ${new Set(projects.map(p=>p.client)).size} klien.`;
+
+  const activeCount=projects.filter(p=>p.status==='active').length;
+  const doneCount=projects.filter(p=>p.status==='done').length;
+  const toIDR=(n,cur)=>cur==='IDR'?n:n*(cur==='USD'?15000:cur==='SGD'?11000:cur==='MYR'?3200:cur==='AUD'?10000:cur==='EUR'?16000:1);
+  const totalIncome=projects.filter(p=>p.status==='done'&&p.income>0).reduce((s,p)=>s+toIDR(p.income,p.currency),0);
+  const uniqueClients=new Set(projects.map(p=>p.client)).size;
+
+  document.getElementById('statProjects').textContent=projects.length;
+  document.getElementById('statProjectSub').textContent=`${activeCount} aktif · ${doneCount} selesai`;
+  document.getElementById('statIncome').textContent=fmtMoneyShort(totalIncome);
+  document.getElementById('statIncomeSub').textContent='dari project selesai';
+  document.getElementById('statClients').textContent=uniqueClients;
+  document.getElementById('statClientSub').textContent=`${clients.length} tercatat`;
+  document.getElementById('statSkills').textContent=skills.length;
+  document.getElementById('statSkillSub').textContent='skill terdaftar';
+  document.getElementById('navBadgeProject').textContent=projects.length;
+
+  // Active projects
+  const activeEl=document.getElementById('dashActiveProjects');
+  const active=projects.filter(p=>p.status==='active').slice(0,4);
+  activeEl.innerHTML=active.length?active.map(p=>{
+    const cat=catConfig[p.category]||catConfig.lainnya;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:1.1rem;">${cat.icon}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+        <div style="font-size:.72rem;color:var(--text3);">${p.client}</div>
+      </div>
+      ${p.income>0?`<span style="font-family:'Space Mono',monospace;font-size:.75rem;font-weight:700;color:var(--green);flex-shrink:0;">${fmtMoneyShort(p.income,p.currency)}</span>`:''}
+    </div>`;
+  }).join(''):'<div class="empty"><div class="ico">💼</div><p>Belum ada project aktif</p></div>';
+
+  // Deadlines
+  const dlEl=document.getElementById('dashDeadlines');
+  const upcoming=projects.filter(p=>p.endDate&&p.status!=='done'&&p.status!=='cancel'&&new Date(p.endDate)>=new Date()).sort((a,b)=>a.endDate.localeCompare(b.endDate)).slice(0,4);
+  dlEl.innerHTML=upcoming.length?upcoming.map(p=>{
+    const d=Math.ceil((new Date(p.endDate)-new Date())/86400000);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:.84rem;">${p.name}</div>
+        <div style="font-size:.72rem;color:var(--text3);">${p.client}</div>
+      </div>
+      <span style="font-size:.72rem;font-weight:800;flex-shrink:0;color:${d<=3?'var(--red)':d<=7?'var(--amber)':'var(--green)'};">${d===0?'Hari ini!':d+'h lagi'}</span>
+    </div>`;
+  }).join(''):'<div class="empty"><div class="ico">📅</div><p>Tidak ada deadline mendatang</p></div>';
+
+  // Chart
+  renderIncomeChart('dashIncomeChart',6);
+}
+
+// ═══════════════════
+// UTILS
+// ═══════════════════
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+function confirmAction(msg,cb){
+  const ov=document.createElement('div');
+  ov.className='confirm-overlay';
+  ov.innerHTML=`<div class="confirm-box">
+    <div style="font-size:2rem;margin-bottom:10px;">⚠️</div>
+    <div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:900;margin-bottom:8px;">Yakin dihapus?</div>
+    <div style="font-size:.82rem;color:var(--text2);margin-bottom:20px;">${msg}</div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button id="_yes" class="btn btn-danger" style="flex:1;">Ya, Hapus</button>
+      <button id="_no" class="btn btn-ghost">Batal</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.querySelector('#_yes').onclick=()=>{ ov.remove(); cb(); };
+  ov.querySelector('#_no').onclick=()=>ov.remove();
+  ov.addEventListener('click',e=>{ if(e.target===ov) ov.remove(); });
+}
+
+function toast(msg,type='info'){
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),3000);
+}
+
+// ═══════════════════
+// INIT & EVENT DELEGATION
+// ═══════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  renderDashboard();
+  document.querySelectorAll('.modal-overlay').forEach(m=>{
+    m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); });
+  });
+
+  // Projects
+  document.getElementById('projectGrid').addEventListener('click',e=>{
+    const btn=e.target.closest('[data-paction]');
+    if(!btn) return;
+    const id=btn.dataset.pid;
+    if(btn.dataset.paction==='edit') openProjectModal(id);
+    if(btn.dataset.paction==='del')  deleteProject(id);
+  });
+
+  // Skills
+  document.getElementById('skillsList').addEventListener('click',e=>{
+    const btn=e.target.closest('[data-sk]');
+    if(!btn) return;
+    const id=btn.dataset.sk;
+    if(btn.dataset.ska==='edit') openSkillModal(id);
+    if(btn.dataset.ska==='del')  deleteSkill(id);
+  });
+
+  // Clients
+  document.getElementById('clientsTable').addEventListener('click',e=>{
+    const btn=e.target.closest('[data-caction]');
+    if(!btn) return;
+    const id=btn.dataset.cid;
+    if(btn.dataset.caction==='edit') openClientModal(id);
+    if(btn.dataset.caction==='del')  deleteClient(id);
+  });
+});
+</script>
+</body>
+</html>

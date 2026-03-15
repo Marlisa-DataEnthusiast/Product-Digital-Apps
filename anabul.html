@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐱 Anabul — Cat Health Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink:    #ff8fab;
+  --pink2:   #ffb3c6;
+  --pink3:   #ffd6e0;
+  --peach:   #ffcba4;
+  --lavender:#c8b6ff;
+  --lav2:    #e2d9f3;
+  --mint:    #b5ead7;
+  --mint2:   #d4f1e4;
+  --yellow:  #ffd166;
+  --blue:    #a8dadc;
+  --red:     #ff6b6b;
+  --bg:      #fff5f7;
+  --card:    #ffffff;
+  --border:  #fce4ec;
+  --text:    #3d2c35;
+  --text2:   #8b6b75;
+  --text3:   #c4a0ac;
+  --shadow:  rgba(255,143,171,.15);
+  /* Theme accent vars */
+  --acc1: #ff8fab; --acc2: #ffb3c6; --acc3: #ffd6e0;
+  --acc-grad: linear-gradient(135deg,#ff8fab,#ffb3c6);
+  --acc-shadow: rgba(255,143,171,.4);
+  --acc-text: #fff;
+}
+
+/* ── THEMES ── */
+[data-theme="candy"] {
+  --bg:#f5f0ff;--card:#fff;--border:#e8dcff;
+  --text:#2d1b69;--text2:#6b5a9e;--text3:#b8a8d8;
+  --shadow:rgba(150,100,255,.15);
+  --acc1:#a855f7;--acc2:#c084fc;--acc3:#ede9fe;
+  --acc-grad:linear-gradient(135deg,#a855f7,#c084fc);
+  --acc-shadow:rgba(168,85,247,.4);--acc-text:#fff;
+}
+[data-theme="mint"] {
+  --bg:#f0fdf8;--card:#fff;--border:#d1fae5;
+  --text:#1a3a2a;--text2:#4a7a6a;--text3:#9abfb5;
+  --shadow:rgba(52,211,153,.15);
+  --acc1:#10b981;--acc2:#34d399;--acc3:#d1fae5;
+  --acc-grad:linear-gradient(135deg,#10b981,#34d399);
+  --acc-shadow:rgba(16,185,129,.4);--acc-text:#fff;
+}
+[data-theme="ocean"] {
+  --bg:#f0f8ff;--card:#fff;--border:#bae6fd;
+  --text:#0c2340;--text2:#3a6a8a;--text3:#8abcda;
+  --shadow:rgba(56,189,248,.15);
+  --acc1:#0ea5e9;--acc2:#38bdf8;--acc3:#e0f2fe;
+  --acc-grad:linear-gradient(135deg,#0ea5e9,#38bdf8);
+  --acc-shadow:rgba(14,165,233,.4);--acc-text:#fff;
+}
+[data-theme="peach"] {
+  --bg:#fff8f0;--card:#fff;--border:#ffe4cc;
+  --text:#3d1f0a;--text2:#8b5a35;--text3:#c4a080;
+  --shadow:rgba(251,146,60,.15);
+  --acc1:#f97316;--acc2:#fb923c;--acc3:#ffedd5;
+  --acc-grad:linear-gradient(135deg,#f97316,#fb923c);
+  --acc-shadow:rgba(249,115,22,.4);--acc-text:#fff;
+}
+[data-theme="dark"] {
+  --bg:#0f0f18;--card:#1a1a2e;--border:#2d2d4e;
+  --text:#f0f0f8;--text2:#9090b8;--text3:#5a5a8a;
+  --shadow:rgba(180,100,255,.15);
+  --acc1:#a78bfa;--acc2:#c4b5fd;--acc3:#2d1b69;
+  --acc-grad:linear-gradient(135deg,#7c3aed,#a78bfa);
+  --acc-shadow:rgba(167,139,250,.4);--acc-text:#fff;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:15px;scroll-behavior:smooth;}
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── CUTE BG PATTERN ── */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255,143,171,.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(200,182,255,.08) 0%, transparent 50%),
+    radial-gradient(circle at 60% 10%, rgba(181,234,215,.08) 0%, transparent 40%);
+}
+
+/* ── LAYOUT ── */
+.app{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 16px 80px;}
+
+/* ── TOPBAR ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 0 16px;flex-wrap:wrap;gap:12px;
+}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{
+  width:44px;height:44px;border-radius:14px;
+  background:var(--acc-grad);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;
+  box-shadow:0 4px 14px var(--acc-shadow);
+}
+.logo-text{
+  font-family:'Fredoka One',sans-serif;font-size:1.5rem;
+  background:var(--acc-grad);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.logo-sub{font-size:.72rem;color:var(--text3);font-weight:600;letter-spacing:.5px;}
+
+/* ── NAV TABS ── */
+.nav{
+  display:flex;gap:6px;flex-wrap:wrap;
+  background:var(--card);border:2px solid var(--border);
+  border-radius:20px;padding:5px;margin-bottom:24px;
+  box-shadow:0 4px 16px var(--shadow);
+}
+.nav-btn{
+  font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;
+  padding:8px 16px;border-radius:14px;border:none;background:none;
+  color:var(--text2);cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;gap:6px;white-space:nowrap;
+}
+.nav-btn:hover{background:var(--acc3);color:var(--acc1);}
+.nav-btn.active{
+  background:var(--acc-grad);
+  color:var(--acc-text);box-shadow:0 4px 12px var(--acc-shadow);
+}
+
+/* ── PAGE ── */
+.page{display:none;}
+.page.active{display:block;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SECTION TITLE ── */
+.section-title{
+  font-family:'Fredoka One',sans-serif;font-size:1.3rem;
+  color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px;
+}
+
+/* ── CARDS ── */
+.card{
+  background:var(--card);border:2px solid var(--border);
+  border-radius:20px;padding:20px;margin-bottom:16px;
+  box-shadow:0 4px 16px var(--shadow);
+}
+.card-title{
+  font-family:'Fredoka One',sans-serif;font-size:1rem;
+  color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;
+}
+
+/* ── CAT CARDS GRID ── */
+.cats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:20px;}
+.cat-card{
+  background:var(--card);border:2px solid var(--border);border-radius:20px;
+  padding:18px;text-align:center;cursor:pointer;
+  transition:all .2s cubic-bezier(.34,1.56,.64,1);
+  position:relative;overflow:hidden;
+}
+.cat-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px var(--shadow);border-color:var(--pink2);}
+.cat-card.selected{border-color:var(--pink);box-shadow:0 8px 24px rgba(255,143,171,.3);}
+.cat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;}
+.cat-avatar{
+  width:64px;height:64px;border-radius:50%;margin:0 auto 10px;
+  display:flex;align-items:center;justify-content:center;font-size:2rem;
+  border:3px solid var(--border);
+}
+.cat-name{font-family:'Fredoka One',sans-serif;font-size:1.1rem;margin-bottom:3px;}
+.cat-breed{font-size:.72rem;color:var(--text3);font-weight:600;}
+.cat-age{
+  display:inline-block;margin-top:8px;
+  background:var(--pink3);color:var(--pink);
+  border-radius:50px;padding:3px 12px;font-size:.72rem;font-weight:800;
+}
+.cat-alerts{display:flex;gap:4px;justify-content:center;margin-top:8px;flex-wrap:wrap;}
+.cat-alert-badge{
+  font-size:.6rem;font-weight:800;padding:2px 8px;border-radius:50px;
+}
+
+/* ── ADD CAT CARD ── */
+.add-cat-card{
+  background:none;border:2px dashed var(--pink2);border-radius:20px;
+  padding:32px 18px;text-align:center;cursor:pointer;
+  transition:all .2s;color:var(--pink);
+}
+.add-cat-card:hover{background:var(--pink3);border-color:var(--pink);}
+.add-cat-card .icon{font-size:2rem;margin-bottom:8px;}
+.add-cat-card .lbl{font-family:'Fredoka One',sans-serif;font-size:.95rem;}
+
+/* ── STATS ROW ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.stat-pill{
+  background:var(--card);border:2px solid var(--border);border-radius:16px;
+  padding:14px;text-align:center;box-shadow:0 2px 8px var(--shadow);
+}
+.stat-val{font-family:'Fredoka One',sans-serif;font-size:1.4rem;line-height:1;margin-bottom:3px;}
+.stat-lbl{font-size:.65rem;color:var(--text3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+
+/* ── SCHEDULE LIST ── */
+.sched-list{display:flex;flex-direction:column;gap:10px;}
+.sched-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);border:2px solid var(--border);border-radius:16px;padding:14px 16px;
+  transition:all .2s;
+}
+.sched-item:hover{border-color:var(--pink2);}
+.sched-item.urgent{border-color:var(--red);background:#fff8f8;}
+.sched-item.soon{border-color:var(--yellow);background:#fffdf0;}
+.sched-item.ok{border-color:var(--mint);background:#f0fff8;}
+.sched-icon{
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;flex-shrink:0;
+}
+.sched-info{flex:1;}
+.sched-title{font-weight:800;font-size:.88rem;margin-bottom:2px;}
+.sched-cat{font-size:.72rem;color:var(--text3);font-weight:600;}
+.sched-date{font-size:.75rem;font-weight:700;text-align:right;white-space:nowrap;}
+
+/* ── FORM ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-full{grid-column:1/-1;}
+.field label{display:block;font-size:.68rem;font-weight:800;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;}
+.field input,.field select,.field textarea{
+  width:100%;background:#fff;border:2px solid var(--border);border-radius:12px;
+  padding:9px 13px;color:var(--text);font-family:'Nunito',sans-serif;
+  font-size:.88rem;font-weight:600;outline:none;transition:border-color .2s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--acc1);}
+.field select option{background:#fff;}
+.field textarea{resize:vertical;min-height:70px;}
+
+/* ── BUTTONS ── */
+.btn{
+  font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;
+  border-radius:12px;padding:10px 20px;border:none;cursor:pointer;
+  transition:all .2s cubic-bezier(.34,1.56,.64,1);
+  display:inline-flex;align-items:center;gap:7px;
+}
+.btn-primary{
+  background:var(--acc-grad);color:var(--acc-text);
+  box-shadow:0 4px 14px var(--acc-shadow);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px var(--acc-shadow);}
+.btn-lav{
+  background:linear-gradient(135deg,var(--lavender),var(--lav2));color:#fff;
+  box-shadow:0 4px 14px rgba(200,182,255,.4);
+}
+.btn-lav:hover{transform:translateY(-2px);}
+.btn-mint{
+  background:linear-gradient(135deg,#52c98a,var(--mint));color:#fff;
+  box-shadow:0 4px 14px rgba(82,201,138,.3);
+}
+.btn-mint:hover{transform:translateY(-2px);}
+.btn-ghost{
+  background:var(--acc3);color:var(--acc1);
+  border:2px solid var(--acc2);
+}
+.btn-ghost:hover{background:var(--acc2);color:var(--acc-text);}
+.btn-danger{background:#fff0f0;color:var(--red);border:2px solid #ffd0d0;}
+.btn-danger:hover{background:#ffe0e0;}
+.btn-sm{padding:6px 14px;font-size:.78rem;}
+.btn-gcal{
+  background:linear-gradient(135deg,#4285f4,#34a853);color:#fff;
+  box-shadow:0 4px 14px rgba(66,133,244,.3);
+}
+.btn-gcal:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(66,133,244,.4);}
+
+/* ── MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(61,44,53,.5);backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--bg);border:2px solid var(--border);
+  border-radius:24px;padding:28px;width:100%;max-width:480px;
+  max-height:90vh;overflow-y:auto;
+  box-shadow:0 24px 60px rgba(255,143,171,.25);
+  animation:modalIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes modalIn{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.modal-title{font-family:'Fredoka One',sans-serif;font-size:1.3rem;color:var(--text);}
+.modal-close{
+  background:var(--pink3);border:none;border-radius:10px;
+  padding:6px 12px;color:var(--pink);font-size:.9rem;cursor:pointer;font-weight:800;
+}
+
+/* ── HEALTH LOG ── */
+.log-list{display:flex;flex-direction:column;gap:10px;}
+.log-item{
+  background:var(--card);border:2px solid var(--border);border-radius:16px;
+  padding:14px 16px;transition:all .2s;
+}
+.log-item:hover{border-color:var(--pink2);}
+.log-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.log-title{font-weight:800;font-size:.88rem;}
+.log-date{font-size:.72rem;color:var(--text3);font-weight:600;white-space:nowrap;}
+.log-note{font-size:.78rem;color:var(--text2);line-height:1.5;}
+.log-tags{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;}
+.log-tag{
+  font-size:.6rem;font-weight:800;padding:2px 9px;border-radius:50px;
+}
+
+/* ── MOMENT CARD ── */
+.moment-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.moment-card{
+  background:var(--card);border:2px solid var(--border);border-radius:20px;
+  padding:16px;transition:all .2s;
+}
+.moment-card:hover{transform:translateY(-3px);border-color:var(--pink2);box-shadow:0 8px 20px var(--shadow);}
+.moment-emoji{font-size:2.5rem;margin-bottom:8px;text-align:center;}
+.moment-title{font-weight:800;font-size:.88rem;margin-bottom:4px;}
+.moment-note{font-size:.76rem;color:var(--text2);line-height:1.5;margin-bottom:8px;}
+.moment-footer{display:flex;justify-content:space-between;align-items:center;}
+.moment-date{font-size:.68rem;color:var(--text3);font-weight:600;}
+.moment-cat-tag{font-size:.65rem;font-weight:800;padding:2px 9px;border-radius:50px;background:var(--pink3);color:var(--pink);}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:.65rem;font-weight:800;padding:3px 10px;border-radius:50px;}
+.badge-pink{background:var(--pink3);color:var(--pink);}
+.badge-lav{background:var(--lav2);color:#7c5cbf;}
+.badge-mint{background:var(--mint2);color:#2e9e6b;}
+.badge-yellow{background:#fff8e1;color:#e6a817;}
+.badge-red{background:#fff0f0;color:var(--red);}
+.badge-blue{background:#e8f4fd;color:#2196f3;}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:40px 20px;color:var(--text3);}
+.empty .icon{font-size:3rem;margin-bottom:12px;}
+.empty p{font-size:.88rem;line-height:1.7;font-weight:600;}
+
+/* ── THEME OPTIONS ── */
+.theme-option{
+  background:var(--card);border:2px solid var(--border);
+  border-radius:14px;padding:12px;cursor:pointer;
+  transition:all .2s;
+}
+.theme-option:hover{transform:translateY(-2px);box-shadow:0 6px 16px var(--shadow);}
+.theme-option.active{border-color:var(--acc1);box-shadow:0 4px 14px var(--acc-shadow);}
+
+/* ── PAWS DECORATION ── */
+.paw-deco{position:fixed;pointer-events:none;z-index:0;opacity:.04;font-size:3rem;user-select:none;}
+
+/* ── UPCOMING ALERT BOX ── */
+.alert-box{
+  border-radius:16px;padding:14px 16px;margin-bottom:12px;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.alert-box.urgent{background:#fff0f0;border:2px solid #ffd0d0;}
+.alert-box.soon{background:#fff8e1;border:2px solid #ffe082;}
+.alert-box p{font-size:.82rem;font-weight:700;line-height:1.5;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  padding:12px 20px;border-radius:16px;font-size:.85rem;font-weight:800;
+  animation:toastIn .3s ease;box-shadow:0 8px 24px var(--shadow);
+  font-family:'Nunito',sans-serif;
+}
+.toast.success{background:linear-gradient(135deg,#52c98a,var(--mint));color:#fff;}
+.toast.error{background:linear-gradient(135deg,var(--red),#ff8a80);color:#fff;}
+.toast.info{background:linear-gradient(135deg,var(--pink),var(--lavender));color:#fff;}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .form-grid{grid-template-columns:1fr;}
+  .nav-btn span.lbl{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- Paw decorations -->
+<div class="paw-deco" style="top:10%;left:5%">🐾</div>
+<div class="paw-deco" style="top:30%;right:3%">🐾</div>
+<div class="paw-deco" style="top:60%;left:8%">🐾</div>
+<div class="paw-deco" style="top:80%;right:6%">🐾</div>
+
+<div class="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-icon">🐱</div>
+      <div>
+        <div class="logo-text">Anabul</div>
+        <div class="logo-sub">Cat Health Tracker</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-ghost btn-sm" onclick="openThemeModal()" title="Ganti Tema">🎨</button>
+      <button class="btn btn-primary btn-sm" onclick="openAddCatModal()">＋ Tambah Kucing</button>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav">
+    <button class="nav-btn active" onclick="nav('dashboard',this)">🏠 <span class="lbl">Dashboard</span></button>
+    <button class="nav-btn" onclick="nav('cats',this)">🐱 <span class="lbl">Kucing</span></button>
+    <button class="nav-btn" onclick="nav('jadwal',this)">📅 <span class="lbl">Jadwal</span></button>
+    <button class="nav-btn" onclick="nav('kesehatan',this)">💊 <span class="lbl">Kesehatan</span></button>
+    <button class="nav-btn" onclick="nav('momen',this)">📸 <span class="lbl">Momen</span></button>
+  </div>
+
+  <!-- ══ DASHBOARD ══ -->
+  <div class="page active" id="page-dashboard">
+    <div class="stats-row">
+      <div class="stat-pill">
+        <div class="stat-val" style="color:var(--pink)" id="statCats">0</div>
+        <div class="stat-lbl">🐱 Kucing</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-val" style="color:var(--red)" id="statUrgent">0</div>
+        <div class="stat-lbl">⚠️ Mendesak</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-val" style="color:var(--yellow)" id="statSoon">0</div>
+        <div class="stat-lbl">📅 Minggu Ini</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-val" style="color:var(--mint)" id="statMoments">0</div>
+        <div class="stat-lbl">📸 Momen</div>
+      </div>
+    </div>
+
+    <div id="dashAlerts"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="card">
+        <div class="card-title">🐱 Anabul Ku</div>
+        <div id="dashCatsList"><div class="empty"><div class="icon">🐱</div><p>Belum ada kucing.<br>Tambah anabul pertama kamu!</p></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📅 Jadwal Terdekat</div>
+        <div id="dashSchedule"><div class="empty"><div class="icon">📅</div><p>Belum ada jadwal</p></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📸 Momen Terbaru</div>
+      <div id="dashMoments"><div class="empty"><div class="icon">📸</div><p>Belum ada momen lucu tercatat</p></div></div>
+    </div>
+  </div>
+
+  <!-- ══ KUCING ══ -->
+  <div class="page" id="page-cats">
+    <div class="section-title">🐱 Semua Anabul</div>
+    <div class="cats-grid" id="catsGrid">
+      <div class="add-cat-card" onclick="openAddCatModal()">
+        <div class="icon">➕</div>
+        <div class="lbl">Tambah Kucing</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ JADWAL ══ -->
+  <div class="page" id="page-jadwal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+      <div class="section-title" style="margin:0;">📅 Jadwal Kesehatan</div>
+      <button class="btn btn-primary btn-sm" onclick="openAddScheduleModal()">＋ Tambah Jadwal</button>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-sm" id="filterAll" style="background:var(--pink);color:#fff;border:none;" onclick="filterSchedule('all',this)">Semua</button>
+      <button class="btn btn-ghost btn-sm" onclick="filterSchedule('vaksin',this)">💉 Vaksin</button>
+      <button class="btn btn-ghost btn-sm" onclick="filterSchedule('obat',this)">💊 Obat</button>
+      <button class="btn btn-ghost btn-sm" onclick="filterSchedule('cacing',this)">🪱 Obat Cacing</button>
+      <button class="btn btn-ghost btn-sm" onclick="filterSchedule('steril',this)">✂️ Steril</button>
+      <button class="btn btn-ghost btn-sm" onclick="filterSchedule('lainnya',this)">📌 Lainnya</button>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+        <input type="checkbox" id="showDone" onchange="renderSchedule(currentSchedFilter)" style="accent-color:var(--pink);width:15px;height:15px;cursor:pointer;">
+        <label for="showDone" style="font-size:.78rem;font-weight:700;color:var(--text2);cursor:pointer;">Tampilkan yang selesai</label>
+      </div>
+    </div>
+
+    <div class="sched-list" id="schedList">
+      <div class="empty"><div class="icon">📅</div><p>Belum ada jadwal.<br>Tambah jadwal kesehatan anabul kamu!</p></div>
+    </div>
+  </div>
+
+  <!-- ══ KESEHATAN ══ -->
+  <div class="page" id="page-kesehatan">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+      <div class="section-title" style="margin:0;">💊 Catatan Kesehatan</div>
+      <button class="btn btn-primary btn-sm" onclick="openAddHealthModal()">＋ Tambah Catatan</button>
+    </div>
+    <div style="margin-bottom:14px;">
+      <select id="filterHealthCat" onchange="renderHealth()" style="background:#fff;border:2px solid var(--border);border-radius:12px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;color:var(--text);outline:none;">
+        <option value="">🐱 Semua Kucing</option>
+      </select>
+    </div>
+    <div class="log-list" id="healthList">
+      <div class="empty"><div class="icon">💊</div><p>Belum ada catatan kesehatan</p></div>
+    </div>
+  </div>
+
+  <!-- ══ MOMEN ══ -->
+  <div class="page" id="page-momen">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+      <div class="section-title" style="margin:0;">📸 Momen Lucu</div>
+      <button class="btn btn-primary btn-sm" onclick="openAddMomentModal()">＋ Tambah Momen</button>
+    </div>
+    <div class="moment-grid" id="momentGrid">
+      <div class="empty" style="grid-column:1/-1"><div class="icon">🥰</div><p>Belum ada momen tercatat.<br>Abadikan kelucuan anabul kamu!</p></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ MODAL: TAMBAH KUCING ══ -->
+<div class="modal-overlay" id="catModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="catModalTitle">🐱 Tambah Kucing</div>
+      <button class="modal-close" onclick="closeModal('catModal')">✕</button>
+    </div>
+    <input type="hidden" id="catId">
+    <div class="form-grid">
+      <div class="field form-full">
+        <label>Nama Kucing *</label>
+        <input type="text" id="catName" placeholder="cth: Mochi, Luna, Oreo">
+      </div>
+      <div class="field">
+        <label>Ras / Jenis</label>
+        <input type="text" id="catBreed" placeholder="cth: Domestic, Persian">
+      </div>
+      <div class="field">
+        <label>Jenis Kelamin</label>
+        <select id="catGender">
+          <option value="jantan">♂ Jantan</option>
+          <option value="betina">♀ Betina</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tanggal Lahir</label>
+        <input type="date" id="catBirthdate">
+      </div>
+      <div class="field">
+        <label>Warna Bulu</label>
+        <input type="text" id="catColor" placeholder="cth: Oranye, Hitam-Putih">
+      </div>
+      <div class="field">
+        <label>Emoji / Ikon</label>
+        <select id="catEmoji">
+          <option value="🐱">🐱 Kucing</option>
+          <option value="🐈">🐈 Kucing Berjalan</option>
+          <option value="🐈‍⬛">🐈‍⬛ Kucing Hitam</option>
+          <option value="😸">😸 Senyum</option>
+          <option value="😻">😻 Jatuh Cinta</option>
+          <option value="🙀">🙀 Kaget</option>
+          <option value="😹">😹 Nangis Seneng</option>
+          <option value="😺">😺 Senyum Lebar</option>
+        </select>
+      </div>
+      <div class="field form-full">
+        <label>Catatan</label>
+        <textarea id="catNotes" placeholder="Karakter, kebiasaan, atau info penting lainnya"></textarea>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button class="btn btn-primary" onclick="saveCat()" style="flex:1">💾 Simpan</button>
+      <button class="btn btn-ghost" onclick="closeModal('catModal')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: TAMBAH JADWAL ══ -->
+<div class="modal-overlay" id="schedModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="schedModalTitle">📅 Tambah Jadwal</div>
+      <button class="modal-close" onclick="closeModal('schedModal')">✕</button>
+    </div>
+    <input type="hidden" id="schedId">
+    <div class="form-grid">
+      <div class="field form-full">
+        <label>Kucing *</label>
+        <select id="schedCat"><option value="">— Pilih Kucing —</option></select>
+      </div>
+      <div class="field">
+        <label>Jenis Jadwal *</label>
+        <select id="schedType">
+          <option value="vaksin">💉 Vaksin</option>
+          <option value="obat">💊 Minum Obat</option>
+          <option value="cacing">🪱 Obat Cacing</option>
+          <option value="steril">✂️ Steril</option>
+          <option value="grooming">✂️ Grooming</option>
+          <option value="checkup">🏥 Check Up</option>
+          <option value="lainnya">📌 Lainnya</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Nama / Keterangan *</label>
+        <input type="text" id="schedName" placeholder="cth: Vaksin Rabies, Obat Cacing">
+      </div>
+      <div class="field">
+        <label>Tanggal Jadwal *</label>
+        <input type="date" id="schedDate">
+      </div>
+      <div class="field">
+        <label>Pengulangan</label>
+        <select id="schedRepeat">
+          <option value="none">Tidak Berulang</option>
+          <option value="daily">Setiap Hari 💊</option>
+          <option value="2days">Setiap 2 Hari</option>
+          <option value="3days">Setiap 3 Hari</option>
+          <option value="weekly">Setiap Minggu</option>
+          <option value="2weeks">Setiap 2 Minggu</option>
+          <option value="monthly">Setiap Bulan</option>
+          <option value="2month">Setiap 2 Bulan</option>
+          <option value="3month">Setiap 3 Bulan</option>
+          <option value="6month">Setiap 6 Bulan</option>
+          <option value="yearly">Setiap Tahun</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Dokter / Klinik</label>
+        <input type="text" id="schedDoctor" placeholder="Nama dokter / klinik">
+      </div>
+      <div class="field form-full">
+        <label>Catatan</label>
+        <textarea id="schedNotes" placeholder="Catatan tambahan, efek samping, dll"></textarea>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="saveSchedule()" style="flex:1">💾 Simpan</button>
+      <button class="btn btn-gcal btn-sm" onclick="addToGoogleCalendar()" title="Export ke Google Calendar">📅 Google Cal</button>
+      <button class="btn btn-ghost" onclick="closeModal('schedModal')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: CATATAN KESEHATAN ══ -->
+<div class="modal-overlay" id="healthModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">💊 Catatan Kesehatan</div>
+      <button class="modal-close" onclick="closeModal('healthModal')">✕</button>
+    </div>
+    <input type="hidden" id="healthId">
+    <div class="form-grid">
+      <div class="field form-full">
+        <label>Kucing *</label>
+        <select id="healthCat"><option value="">— Pilih Kucing —</option></select>
+      </div>
+      <div class="field">
+        <label>Tanggal *</label>
+        <input type="date" id="healthDate">
+      </div>
+      <div class="field">
+        <label>Kategori</label>
+        <select id="healthType">
+          <option value="vaksin">💉 Vaksin</option>
+          <option value="obat">💊 Obat</option>
+          <option value="cacing">🪱 Obat Cacing</option>
+          <option value="sakit">🤒 Gejala Sakit</option>
+          <option value="checkup">🏥 Check Up</option>
+          <option value="berat">⚖️ Berat Badan</option>
+          <option value="steril">✂️ Steril</option>
+          <option value="lainnya">📌 Lainnya</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Judul Catatan *</label>
+        <input type="text" id="healthTitle" placeholder="cth: Vaksin Rabies ke-1">
+      </div>
+      <div class="field form-full">
+        <label>Detail / Catatan</label>
+        <textarea id="healthNote" placeholder="Gejala, obat yang diberikan, dosis, reaksi, dll"></textarea>
+      </div>
+      <div class="field">
+        <label>Dokter / Klinik</label>
+        <input type="text" id="healthDoctor" placeholder="Nama dokter / klinik">
+      </div>
+      <div class="field">
+        <label>Berat Badan (kg)</label>
+        <input type="number" id="healthWeight" placeholder="cth: 4.2" step="0.1" min="0">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button class="btn btn-primary" onclick="saveHealth()" style="flex:1">💾 Simpan</button>
+      <button class="btn btn-ghost" onclick="closeModal('healthModal')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: MOMEN ══ -->
+<div class="modal-overlay" id="momentModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📸 Tambah Momen</div>
+      <button class="modal-close" onclick="closeModal('momentModal')">✕</button>
+    </div>
+    <input type="hidden" id="momentId">
+    <div class="form-grid">
+      <div class="field form-full">
+        <label>Kucing *</label>
+        <select id="momentCat"><option value="">— Pilih Kucing —</option></select>
+      </div>
+      <div class="field">
+        <label>Tanggal</label>
+        <input type="date" id="momentDate">
+      </div>
+      <div class="field">
+        <label>Emoji Momen</label>
+        <select id="momentEmoji">
+          <option value="🥰">🥰 Gemas</option>
+          <option value="😂">😂 Lucu Banget</option>
+          <option value="😴">😴 Tidur Imut</option>
+          <option value="🎉">🎉 Milestone</option>
+          <option value="🏆">🏆 Prestasi</option>
+          <option value="💕">💕 Manja</option>
+          <option value="😼">😼 Nakal</option>
+          <option value="🐾">🐾 Aktivitas</option>
+          <option value="🌟">🌟 Spesial</option>
+        </select>
+      </div>
+      <div class="field form-full">
+        <label>Judul Momen *</label>
+        <input type="text" id="momentTitle" placeholder="cth: Pertama kali lompat ke lemari!">
+      </div>
+      <div class="field form-full">
+        <label>Cerita / Catatan</label>
+        <textarea id="momentNote" placeholder="Ceritain momen lucunya di sini..."></textarea>
+      </div>
+      <!-- FOTO UPLOAD -->
+      <div class="field form-full">
+        <div style="font-size:.68rem;font-weight:800;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;">🖼️ Foto (opsional)</div>
+        <div id="photoUploadArea" style="border:2px dashed var(--border);border-radius:14px;padding:20px;text-align:center;transition:all .2s;position:relative;min-height:80px;">
+          <!-- Input file FULL COVER — paling reliable di semua browser -->
+          <input type="file" id="momentPhotoInput" accept="image/*"
+            style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;">
+          <div id="photoPreview" style="display:none;position:relative;z-index:1;pointer-events:none;">
+            <img id="photoPreviewImg" style="max-width:100%;max-height:200px;border-radius:10px;object-fit:contain;display:block;margin:0 auto;">
+          </div>
+          <div id="photoPlaceholder" style="position:relative;z-index:1;pointer-events:none;">
+            <div style="font-size:2rem;margin-bottom:6px;">🖼️</div>
+            <div style="font-weight:800;font-size:.82rem;color:var(--acc1);">Klik untuk pilih foto</div>
+            <div style="font-size:.7rem;color:var(--text3);margin-top:3px;">dari galeri atau folder · auto dikompres</div>
+          </div>
+        </div>
+        <button type="button" id="removePhotoBtn" onclick="removePhoto()" style="display:none;margin-top:6px;background:#fff0f0;border:none;border-radius:8px;padding:6px 14px;color:var(--red);font-family:'Nunito',sans-serif;font-weight:800;font-size:.75rem;cursor:pointer;width:100%;">🗑 Hapus Foto</button>
+        <div id="photoStorageWarn" style="display:none;margin-top:6px;font-size:.72rem;color:var(--red);font-weight:700;">⚠️ Storage hampir penuh! Hapus beberapa foto lama.</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button class="btn btn-primary" onclick="saveMoment()" style="flex:1">💾 Simpan</button>
+      <button class="btn btn-ghost" onclick="closeModal('momentModal')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: DETAIL KUCING ══ -->
+<div class="modal-overlay" id="catDetailModal">
+  <div class="modal" style="max-width:540px;">
+    <div class="modal-header">
+      <div class="modal-title" id="catDetailTitle">Detail Kucing</div>
+      <button class="modal-close" onclick="closeModal('catDetailModal')">✕</button>
+    </div>
+    <div id="catDetailContent"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: TEMA ══ -->
+<div class="modal-overlay" id="themeModal">
+  <div class="modal" style="max-width:360px;">
+    <div class="modal-header">
+      <div class="modal-title">🎨 Pilih Tema</div>
+      <button class="modal-close" onclick="closeModal('themeModal')">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="theme-option" data-theme-pick="pink" onclick="setTheme('pink',this)">
+        <div style="height:40px;border-radius:10px;background:linear-gradient(135deg,#ff8fab,#ffb3c6);margin-bottom:8px;"></div>
+        <div style="font-weight:800;font-size:.85rem;">🌸 Pink</div>
+        <div style="font-size:.7rem;color:var(--text3);">Default manis</div>
+      </div>
+      <div class="theme-option" data-theme-pick="candy" onclick="setTheme('candy',this)">
+        <div style="height:40px;border-radius:10px;background:linear-gradient(135deg,#a855f7,#c084fc);margin-bottom:8px;"></div>
+        <div style="font-weight:800;font-size:.85rem;">🍬 Candy</div>
+        <div style="font-size:.7rem;color:var(--text3);">Ungu lavender</div>
+      </div>
+      <div class="theme-option" data-theme-pick="mint" onclick="setTheme('mint',this)">
+        <div style="height:40px;border-radius:10px;background:linear-gradient(135deg,#10b981,#34d399);margin-bottom:8px;"></div>
+        <div style="font-weight:800;font-size:.85rem;">🍃 Mint</div>
+        <div style="font-size:.7rem;color:var(--text3);">Hijau segar</div>
+      </div>
+      <div class="theme-option" data-theme-pick="ocean" onclick="setTheme('ocean',this)">
+        <div style="height:40px;border-radius:10px;background:linear-gradient(135deg,#0ea5e9,#38bdf8);margin-bottom:8px;"></div>
+        <div style="font-weight:800;font-size:.85rem;">🌊 Ocean</div>
+        <div style="font-size:.7rem;color:var(--text3);">Biru tenang</div>
+      </div>
+      <div class="theme-option" data-theme-pick="peach" onclick="setTheme('peach',this)">
+        <div style="height:40px;border-radius:10px;background:linear-gradient(135deg,#f97316,#fb923c);margin-bottom:8px;"></div>
+        <div style="font-weight:800;font-size:.85rem;">🌅 Peach</div>
+        <div style="font-size:.7rem;color:var(--text3);">Oranye hangat</div>
+      </div>
+      <div class="theme-option" data-theme-pick="dark" onclick="setTheme('dark',this)">
+        <div style="height:40px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#a78bfa);margin-bottom:8px;"></div>
+        <div style="font-weight:800;font-size:.85rem;">🌙 Dark</div>
+        <div style="font-size:.7rem;color:var(--text3);">Gelap elegan</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// FOTO UPLOAD
+// ═══════════════════════════════════════════
+let currentPhoto = null; // base64 string
+
+function handlePhotoUpload(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){
+    toast('File harus berupa gambar! 🖼️','error'); return;
+  }
+  // Kompres foto pakai canvas
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const canvas = document.createElement('canvas');
+      const MAX = 800;
+      let w = img.width, h = img.height;
+      if(w > MAX || h > MAX){
+        if(w > h){ h = Math.round(h*MAX/w); w = MAX; }
+        else { w = Math.round(w*MAX/h); h = MAX; }
+      }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/jpeg', 0.72);
+      currentPhoto = compressed;
+      // Show preview
+      document.getElementById('photoPreviewImg').src = compressed;
+      document.getElementById('photoPreview').style.display    = 'block';
+      document.getElementById('photoPlaceholder').style.display= 'none';
+      document.getElementById('removePhotoBtn').style.display  = 'block';
+      // Check storage usage
+      checkStorageUsage();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto(){
+  currentPhoto = null;
+  document.getElementById('momentPhotoInput').value = '';
+  document.getElementById('photoPreview').style.display    = 'none';
+  document.getElementById('photoPlaceholder').style.display= 'block';
+  document.getElementById('removePhotoBtn').style.display  = 'none';
+}
+
+function checkStorageUsage(){
+  try {
+    let total = 0;
+    for(let k in localStorage){ total += localStorage[k].length; }
+    const mb = total * 2 / 1024 / 1024;
+    const warn = document.getElementById('photoStorageWarn');
+    if(warn) warn.style.display = mb > 3 ? 'block' : 'none';
+  } catch(e){}
+}
+
+function resetPhotoUpload(){
+  currentPhoto = null;
+  const inp  = document.getElementById('momentPhotoInput');
+  const prev = document.getElementById('photoPreview');
+  const ph   = document.getElementById('photoPlaceholder');
+  const btn  = document.getElementById('removePhotoBtn');
+  const warn = document.getElementById('photoStorageWarn');
+  if(inp)  inp.value = '';
+  if(prev) prev.style.display = 'none';
+  if(ph)   ph.style.display   = 'block';
+  if(btn)  btn.style.display  = 'none';
+  if(warn) warn.style.display = 'none';
+}
+function openThemeModal(){
+  document.getElementById('themeModal').classList.add('open');
+  // Mark active theme
+  const current = localStorage.getItem('anabul_theme')||'pink';
+  document.querySelectorAll('.theme-option').forEach(el=>{
+    el.classList.toggle('active', el.dataset.themePick===current);
+  });
+}
+
+function setTheme(theme, el){
+  document.documentElement.setAttribute('data-theme', theme==='pink'?'':theme);
+  localStorage.setItem('anabul_theme', theme);
+  document.querySelectorAll('.theme-option').forEach(e=>e.classList.remove('active'));
+  if(el) el.classList.add('active');
+  closeModal('themeModal');
+  toast('Tema diubah! 🎨','success');
+}
+
+// Apply saved theme on load
+(function(){
+  const t = localStorage.getItem('anabul_theme');
+  if(t && t!=='pink') document.documentElement.setAttribute('data-theme', t);
+})();
+const KEY = { cats:'anabul_cats', schedules:'anabul_sched', health:'anabul_health', moments:'anabul_moments' };
+const load = k => { try{ return JSON.parse(localStorage.getItem(k)||'[]'); }catch(e){ return []; } };
+const save = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+
+let cats      = load(KEY.cats);
+let schedules = load(KEY.schedules);
+let health    = load(KEY.health);
+let moments   = load(KEY.moments);
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const fmtDate = d => d ? new Date(d+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+const today = () => new Date().toISOString().split('T')[0];
+
+function calcAge(birthdate){
+  if(!birthdate) return '—';
+  const b = new Date(birthdate);
+  const n = new Date();
+  const months = (n.getFullYear()-b.getFullYear())*12 + (n.getMonth()-b.getMonth());
+  if(months < 1) return 'Bayi 🍼';
+  if(months < 12) return `${months} bulan`;
+  const years = Math.floor(months/12);
+  const rem   = months % 12;
+  return rem > 0 ? `${years}th ${rem}bl` : `${years} tahun`;
+}
+
+function daysUntil(dateStr){
+  const t = new Date(today()); t.setHours(0,0,0,0);
+  const d = new Date(dateStr); d.setHours(0,0,0,0);
+  return Math.ceil((d-t)/(1000*60*60*24));
+}
+
+function getCat(id){ return cats.find(c=>c.id===id)||{}; }
+
+const typeConfig = {
+  vaksin:   { icon:'💉', color:'#ffd6e0', text:'#c0384e', label:'Vaksin' },
+  obat:     { icon:'💊', color:'#e8f4fd', text:'#1565c0', label:'Obat' },
+  cacing:   { icon:'🪱', color:'#f1f8e9', text:'#388e3c', label:'Obat Cacing' },
+  steril:   { icon:'✂️', color:' #f3e5f5', text:'#7b1fa2', label:'Steril' },
+  grooming: { icon:'✂️', color:'#fff8e1', text:'#f57f17', label:'Grooming' },
+  checkup:  { icon:'🏥', color:'#e3f2fd', text:'#1976d2', label:'Check Up' },
+  sakit:    { icon:'🤒', color:'#fff3e0', text:'#e65100', label:'Sakit' },
+  berat:    { icon:'⚖️', color:'#f3e5f5', text:'#7b1fa2', label:'Berat Badan' },
+  lainnya:  { icon:'📌', color:'#fce4ec', text:'#c2185b', label:'Lainnya' },
+};
+
+const catColors = ['#ff8fab','#c8b6ff','#b5ead7','#ffd166','#a8dadc','#ffb347','#ff6b6b','#84dcc6'];
+
+// ═══════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════
+function nav(page, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if(el) el.classList.add('active');
+  if(page==='dashboard')  renderDashboard();
+  if(page==='cats')       renderCats();
+  if(page==='jadwal')     renderSchedule('all');
+  if(page==='kesehatan')  renderHealth();
+  if(page==='momen')      renderMoments();
+}
+
+// ═══════════════════════════════════════════
+// CATS
+// ═══════════════════════════════════════════
+function openAddCatModal(id){
+  const el = document.getElementById('catModal');
+  if(id){
+    const c = getCat(id);
+    document.getElementById('catModalTitle').textContent = '✏️ Edit Kucing';
+    document.getElementById('catId').value       = c.id;
+    document.getElementById('catName').value     = c.name||'';
+    document.getElementById('catBreed').value    = c.breed||'';
+    document.getElementById('catGender').value   = c.gender||'jantan';
+    document.getElementById('catBirthdate').value= c.birthdate||'';
+    document.getElementById('catColor').value    = c.color||'';
+    document.getElementById('catEmoji').value    = c.emoji||'🐱';
+    document.getElementById('catNotes').value    = c.notes||'';
+  } else {
+    document.getElementById('catModalTitle').textContent = '🐱 Tambah Kucing';
+    document.getElementById('catId').value = '';
+    ['catName','catBreed','catBirthdate','catColor','catNotes'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('catGender').value = 'jantan';
+    document.getElementById('catEmoji').value  = '🐱';
+  }
+  el.classList.add('open');
+}
+
+function saveCat(){
+  const name = document.getElementById('catName').value.trim();
+  if(!name){ toast('Nama kucing wajib diisi! 🐱','error'); return; }
+  const id = document.getElementById('catId').value;
+  const data = {
+    id: id||uid(), name,
+    breed:     document.getElementById('catBreed').value.trim(),
+    gender:    document.getElementById('catGender').value,
+    birthdate: document.getElementById('catBirthdate').value,
+    color:     document.getElementById('catColor').value.trim(),
+    emoji:     document.getElementById('catEmoji').value,
+    notes:     document.getElementById('catNotes').value.trim(),
+    createdAt: id ? getCat(id).createdAt : new Date().toISOString(),
+  };
+  if(id) cats = cats.map(c=>c.id===id?data:c);
+  else cats.push(data);
+  save(KEY.cats, cats);
+  closeModal('catModal');
+  populateCatSelects();
+  renderDashboard();
+  toast(id?`${name} diupdate! 🐾`:`${name} ditambahkan! 🎉`,'success');
+}
+
+function deleteCat(id){
+  const c = getCat(id);
+  confirmAction(`${c.name} dan semua data terkait akan dihapus.`, ()=>{
+    cats      = cats.filter(x=>x.id!==id);
+    schedules = schedules.filter(x=>x.catId!==id);
+    health    = health.filter(x=>x.catId!==id);
+    moments   = moments.filter(x=>x.catId!==id);
+    save(KEY.cats,cats); save(KEY.schedules,schedules); save(KEY.health,health); save(KEY.moments,moments);
+    closeModal('catDetailModal');
+    renderCats();
+    renderDashboard();
+    populateCatSelects();
+    toast(`${c.name} dihapus 😢`,'info');
+  });
+}
+
+function renderCats(){
+  const grid = document.getElementById('catsGrid');
+  const catCards = cats.map((c,i)=>{
+    const color = catColors[i%catColors.length];
+    const catScheds = schedules.filter(s=>s.catId===c.id);
+    const urgentCount = catScheds.filter(s=>{ const d=daysUntil(s.date); return !s.done&&d>=0&&d<=3; }).length;
+    const soonCount   = catScheds.filter(s=>{ const d=daysUntil(s.date); return !s.done&&d>3&&d<=7; }).length;
+    return `<div class="cat-card">
+      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:${color};border-radius:18px 18px 0 0;"></div>
+      <div style="cursor:pointer;" data-action-c="detail-cat" data-id="${c.id}">
+        <div class="cat-avatar" style="background:${color}33;border-color:${color}55;">${c.emoji||'🐱'}</div>
+        <div class="cat-name">${c.name}</div>
+        <div class="cat-breed">${c.breed||'Kucing Domestik'} · ${c.gender==='betina'?'♀':'♂'}</div>
+        <div class="cat-age">${calcAge(c.birthdate)}</div>
+        ${urgentCount||soonCount?`<div class="cat-alerts">
+          ${urgentCount?`<span class="cat-alert-badge" style="background:#fff0f0;color:var(--red);">⚠ ${urgentCount} mendesak</span>`:''}
+          ${soonCount?`<span class="cat-alert-badge" style="background:#fff8e1;color:#e6a817;">📅 ${soonCount} minggu ini</span>`:''}
+        </div>`:''}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:12px;">
+        <button class="btn btn-ghost btn-sm" style="flex:1;" data-action-c="edit-cat" data-id="${c.id}">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" data-action-c="del-cat" data-id="${c.id}">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+  grid.innerHTML = catCards + `<div class="add-cat-card" onclick="openAddCatModal()">
+    <div class="icon">➕</div><div class="lbl">Tambah Kucing</div>
+  </div>`;
+}
+
+function showCatDetail(id){
+  const c = getCat(id);
+  const catScheds  = schedules.filter(s=>s.catId===id).sort((a,b)=>a.date.localeCompare(b.date));
+  const catHealth  = health.filter(h=>h.catId===id).sort((a,b)=>b.date.localeCompare(a.date));
+  const catMoments = moments.filter(m=>m.catId===id).sort((a,b)=>b.date.localeCompare(a.date));
+  const i = cats.findIndex(x=>x.id===id);
+  const color = catColors[i%catColors.length];
+
+  document.getElementById('catDetailTitle').textContent = `${c.emoji||'🐱'} ${c.name}`;
+  document.getElementById('catDetailContent').innerHTML = `
+    <div style="text-align:center;padding:16px 0;border-bottom:2px solid var(--border);margin-bottom:16px;">
+      <div style="font-size:3.5rem;margin-bottom:8px;">${c.emoji||'🐱'}</div>
+      <div style="font-size:1.2rem;font-weight:900;margin-bottom:4px;">${c.name}</div>
+      <div style="font-size:.78rem;color:var(--text2);font-weight:600;">${c.breed||'Kucing Domestik'} · ${c.gender==='betina'?'♀ Betina':'♂ Jantan'} · ${c.color||'—'}</div>
+      <div style="margin-top:8px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <span class="badge badge-pink">🎂 ${calcAge(c.birthdate)}</span>
+        ${c.birthdate?`<span class="badge badge-lav">📅 ${fmtDate(c.birthdate)}</span>`:''}
+      </div>
+      ${c.notes?`<div style="margin-top:10px;font-size:.78rem;color:var(--text2);background:var(--pink3);border-radius:10px;padding:8px 12px;">${c.notes}</div>`:''}
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+      <button class="btn btn-ghost btn-sm" onclick="openAddCatModal('${c.id}')">✏️ Edit</button>
+      <button class="btn btn-primary btn-sm" onclick="openAddScheduleForCat('${c.id}')">📅 + Jadwal</button>
+      <button class="btn btn-lav btn-sm" onclick="openAddHealthForCat('${c.id}')">💊 + Kesehatan</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteCat('${c.id}')">🗑 Hapus</button>
+    </div>
+    ${catScheds.length?`<div style="margin-bottom:14px;"><div style="font-weight:800;font-size:.82rem;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">📅 Jadwal (${catScheds.length})</div>
+      ${catScheds.slice(0,3).map(s=>{ const d=daysUntil(s.date); const cfg=typeConfig[s.type]||typeConfig.lainnya;
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+          <span style="background:${cfg.color};border-radius:8px;padding:4px 8px;font-size:.85rem;">${cfg.icon}</span>
+          <div style="flex:1"><div style="font-weight:700;font-size:.82rem;">${s.name}</div><div style="font-size:.7rem;color:var(--text3);">${fmtDate(s.date)}</div></div>
+          <span style="font-size:.72rem;font-weight:800;color:${d<0?'var(--text3)':d<=3?'var(--red)':d<=7?'#e6a817':'#2e9e6b'};">${d<0?'Lewat':d===0?'Hari ini!':d+'h lagi'}</span>
+        </div>`;}).join('')}
+    </div>`:''}
+    ${catHealth.length?`<div><div style="font-weight:800;font-size:.82rem;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">💊 Catatan Terbaru</div>
+      ${catHealth.slice(0,3).map(h=>{ const cfg=typeConfig[h.type]||typeConfig.lainnya;
+        return `<div style="padding:8px 0;border-bottom:1px solid var(--border);">
+          <div style="display:flex;justify-content:space-between;"><span style="font-weight:700;font-size:.82rem;">${cfg.icon} ${h.title}</span><span style="font-size:.7rem;color:var(--text3);">${fmtDate(h.date)}</span></div>
+          ${h.note?`<div style="font-size:.74rem;color:var(--text2);margin-top:2px;">${h.note}</div>`:''}
+        </div>`;}).join('')}
+    </div>`:''}
+  `;
+  document.getElementById('catDetailModal').classList.add('open');
+}
+
+// ═══════════════════════════════════════════
+// SCHEDULES
+// ═══════════════════════════════════════════
+function openAddScheduleModal(id){
+  populateCatSelect('schedCat');
+  document.getElementById('schedDate').value = today();
+  document.getElementById('schedId').value = '';
+  ['schedName','schedDoctor','schedNotes'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('schedType').value   = 'vaksin';
+  document.getElementById('schedRepeat').value = 'none';
+  if(id){
+    const s = schedules.find(x=>x.id===id);
+    if(s){
+      document.getElementById('schedModalTitle').textContent = '✏️ Edit Jadwal';
+      document.getElementById('schedId').value     = s.id;
+      document.getElementById('schedCat').value    = s.catId;
+      document.getElementById('schedType').value   = s.type;
+      document.getElementById('schedName').value   = s.name;
+      document.getElementById('schedDate').value   = s.date;
+      document.getElementById('schedRepeat').value = s.repeat||'none';
+      document.getElementById('schedDoctor').value = s.doctor||'';
+      document.getElementById('schedNotes').value  = s.notes||'';
+    }
+  } else {
+    document.getElementById('schedModalTitle').textContent = '📅 Tambah Jadwal';
+  }
+  document.getElementById('schedModal').classList.add('open');
+}
+
+function openAddScheduleForCat(catId){
+  openAddScheduleModal();
+  document.getElementById('schedCat').value = catId;
+  closeModal('catDetailModal');
+}
+
+function saveSchedule(){
+  const catId = document.getElementById('schedCat').value;
+  const name  = document.getElementById('schedName').value.trim();
+  const date  = document.getElementById('schedDate').value;
+  if(!catId){ toast('Pilih kucing dulu! 🐱','error'); return; }
+  if(!name)  { toast('Isi nama jadwal!','error'); return; }
+  if(!date)  { toast('Pilih tanggal!','error'); return; }
+  const id = document.getElementById('schedId').value;
+  const data = {
+    id: id||uid(), catId, name, date,
+    type:   document.getElementById('schedType').value,
+    repeat: document.getElementById('schedRepeat').value,
+    doctor: document.getElementById('schedDoctor').value.trim(),
+    notes:  document.getElementById('schedNotes').value.trim(),
+    done:   false,
+    createdAt: new Date().toISOString(),
+  };
+  if(id) schedules = schedules.map(s=>s.id===id?data:s);
+  else schedules.push(data);
+  save(KEY.schedules, schedules);
+  closeModal('schedModal');
+  renderSchedule(currentSchedFilter);
+  renderDashboard();
+  toast(`Jadwal ${name} disimpan! 📅`,'success');
+}
+
+function markScheduleDone(id){
+  schedules = schedules.map(s=>{
+    if(s.id!==id) return s;
+    const updated = {...s, done:!s.done};
+    // Auto-create next schedule if repeat
+    if(!s.done && s.repeat && s.repeat!=='none'){
+      const next = new Date(s.date);
+      if(s.repeat==='daily')       next.setDate(next.getDate()+1);
+      else if(s.repeat==='2days')  next.setDate(next.getDate()+2);
+      else if(s.repeat==='3days')  next.setDate(next.getDate()+3);
+      else if(s.repeat==='weekly') next.setDate(next.getDate()+7);
+      else if(s.repeat==='2weeks') next.setDate(next.getDate()+14);
+      else if(s.repeat==='monthly') next.setMonth(next.getMonth()+1);
+      else if(s.repeat==='2month') next.setMonth(next.getMonth()+2);
+      else if(s.repeat==='3month') next.setMonth(next.getMonth()+3);
+      else if(s.repeat==='6month') next.setMonth(next.getMonth()+6);
+      else if(s.repeat==='yearly') next.setFullYear(next.getFullYear()+1);
+      const nextSched = {...s, id:uid(), date:next.toISOString().split('T')[0], done:false, createdAt:new Date().toISOString()};
+      schedules.push(nextSched);
+    }
+    return updated;
+  });
+  save(KEY.schedules, schedules);
+  renderSchedule(currentSchedFilter);
+  renderDashboard();
+  toast('Jadwal diupdate! 🐾','success');
+}
+
+function deleteSchedule(id){
+  if(!confirm('Hapus jadwal ini?')) return;
+  schedules = schedules.filter(s=>s.id!==id);
+  save(KEY.schedules, schedules);
+  renderSchedule(currentSchedFilter);
+  renderDashboard();
+  toast('Jadwal dihapus','info');
+}
+
+function addToGoogleCalendar(){
+  const catId = document.getElementById('schedCat').value;
+  const name  = document.getElementById('schedName').value.trim();
+  const date  = document.getElementById('schedDate').value;
+  const type  = document.getElementById('schedType').value;
+  const notes = document.getElementById('schedNotes').value.trim();
+  const cat   = getCat(catId);
+
+  if(!name||!date){ toast('Isi nama & tanggal dulu!','error'); return; }
+
+  const cfg = typeConfig[type]||typeConfig.lainnya;
+  const title = encodeURIComponent(`${cfg.icon} ${cat.name||'Anabul'}: ${name}`);
+  const details = encodeURIComponent(`Anabul: ${cat.name||'—'}\nJenis: ${cfg.label}\n${notes?'Catatan: '+notes:''}\n\nDicatat via Anabul Health Tracker 🐱`);
+
+  // Format date for Google Calendar: YYYYMMDD
+  const d = date.replace(/-/g,'');
+  const nextDay = new Date(date); nextDay.setDate(nextDay.getDate()+1);
+  const nd = nextDay.toISOString().split('T')[0].replace(/-/g,'');
+
+  const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${d}/${nd}&details=${details}`;
+  window.open(url, '_blank');
+  toast('Membuka Google Calendar... 📅','info');
+}
+
+let currentSchedFilter = 'all';
+function filterSchedule(type, el){
+  currentSchedFilter = type;
+  document.querySelectorAll('#page-jadwal .btn-ghost,.btn[id="filterAll"]').forEach(b=>{
+    b.style.background=''; b.style.color=''; b.className=b.className.replace('btn-primary-active','');
+  });
+  if(el){ el.style.background='var(--pink)'; el.style.color='#fff'; }
+  renderSchedule(type);
+}
+
+function renderSchedule(filter){
+  const list = document.getElementById('schedList');
+  const showDone = document.getElementById('showDone')?.checked || false;
+  let filtered = schedules;
+  if(filter && filter!=='all') filtered = filtered.filter(s=>s.type===filter);
+  if(!showDone) filtered = filtered.filter(s=>!s.done);
+  filtered = filtered.sort((a,b)=>{
+    // Aktif dulu, lalu done; dalam masing2 grup sort by date
+    if(a.done !== b.done) return a.done ? 1 : -1;
+    return a.date.localeCompare(b.date);
+  });
+
+  if(!filtered.length){
+    list.innerHTML='<div class="empty"><div class="icon">📅</div><p>Belum ada jadwal untuk kategori ini</p></div>'; return;
+  }
+
+  list.innerHTML = filtered.map(s=>{
+    const cat = getCat(s.catId);
+    const d   = daysUntil(s.date);
+    const cfg = typeConfig[s.type]||typeConfig.lainnya;
+    const cls = s.done?'ok':d<0?'':d<=3?'urgent':d<=7?'soon':'ok';
+    const dateStr = d<0?`${Math.abs(d)} hari lalu`:d===0?'Hari ini! 🔔':d<=3?`${d} hari lagi ⚠️`:d<=7?`${d} hari lagi 📅`:`${d} hari lagi`;
+    const dateColor = s.done?'var(--text3)':d<0?'var(--text3)':d<=3?'var(--red)':d<=7?'#e6a817':'#2e9e6b';
+
+    return `<div class="sched-item ${s.done?'ok':cls}">
+      <div class="sched-icon" style="background:${cfg.color};">${cfg.icon}</div>
+      <div class="sched-info">
+        <div class="sched-title" style="${s.done?'text-decoration:line-through;color:var(--text3);':''}">${s.name}</div>
+        <div class="sched-cat">${cat.emoji||'🐱'} ${cat.name||'—'} · ${cfg.label}${s.doctor?' · '+s.doctor:''}${s.repeat&&s.repeat!=='none'?' 🔁':''}</div>
+        ${s.notes?`<div style="font-size:.72rem;color:var(--text3);margin-top:2px;">${s.notes}</div>`:''}
+      </div>
+      <div>
+        <div class="sched-date" style="color:${dateColor};">${s.done?'✅ Selesai':fmtDate(s.date)}</div>
+        <div style="font-size:.68rem;color:${dateColor};text-align:right;margin-top:2px;">${s.done?'':dateStr}</div>
+        <div style="display:flex;gap:4px;margin-top:8px;justify-content:flex-end;flex-wrap:wrap;">
+          <button class="btn btn-sm" style="background:var(--lav2);color:#7c5cbf;border:none;padding:4px 10px;font-size:.68rem;" data-action="edit-sched" data-id="${s.id}">✏️</button>
+          <button class="btn btn-sm" style="background:${s.done?'var(--pink3)':'var(--mint2)'};color:${s.done?'var(--pink)':'#2e9e6b'};border:none;padding:4px 10px;font-size:.68rem;" data-action="done-sched" data-id="${s.id}">${s.done?'Batalkan':'✓ Selesai'}</button>
+          <button class="btn btn-gcal btn-sm" style="padding:4px 8px;font-size:.68rem;" data-action="gcal-sched" data-id="${s.id}" title="Google Calendar">📅</button>
+          <button class="btn btn-danger btn-sm" style="padding:4px 8px;font-size:.68rem;" data-action="del-sched" data-id="${s.id}">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addToGCalDirect(id){
+  const s   = schedules.find(x=>x.id===id);
+  if(!s) return;
+  const cat = getCat(s.catId);
+  const cfg = typeConfig[s.type]||typeConfig.lainnya;
+  const title   = encodeURIComponent(`${cfg.icon} ${cat.name||'Anabul'}: ${s.name}`);
+  const details = encodeURIComponent(`Anabul: ${cat.name||'—'}\nJenis: ${cfg.label}\n${s.notes?'Catatan: '+s.notes:''}\n\nDicatat via Anabul Health Tracker 🐱`);
+  const d  = s.date.replace(/-/g,'');
+  const nd = new Date(s.date); nd.setDate(nd.getDate()+1);
+  const nds= nd.toISOString().split('T')[0].replace(/-/g,'');
+  window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${d}/${nds}&details=${details}`,'_blank');
+  toast('Membuka Google Calendar... 📅','info');
+}
+
+// ═══════════════════════════════════════════
+// HEALTH
+// ═══════════════════════════════════════════
+function openAddHealthModal(id){
+  populateCatSelect('healthCat');
+  document.getElementById('healthDate').value = today();
+  document.getElementById('healthId').value = '';
+  ['healthTitle','healthNote','healthDoctor','healthWeight'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('healthType').value = 'vaksin';
+  if(id){
+    const h = health.find(x=>x.id===id);
+    if(h){
+      document.getElementById('healthId').value     = h.id;
+      document.getElementById('healthCat').value    = h.catId;
+      document.getElementById('healthDate').value   = h.date;
+      document.getElementById('healthType').value   = h.type;
+      document.getElementById('healthTitle').value  = h.title;
+      document.getElementById('healthNote').value   = h.note||'';
+      document.getElementById('healthDoctor').value = h.doctor||'';
+      document.getElementById('healthWeight').value = h.weight||'';
+    }
+  }
+  document.getElementById('healthModal').classList.add('open');
+}
+
+function openAddHealthForCat(catId){
+  openAddHealthModal();
+  document.getElementById('healthCat').value = catId;
+  closeModal('catDetailModal');
+}
+
+function saveHealth(){
+  const catId = document.getElementById('healthCat').value;
+  const title = document.getElementById('healthTitle').value.trim();
+  const date  = document.getElementById('healthDate').value;
+  if(!catId){ toast('Pilih kucing dulu! 🐱','error'); return; }
+  if(!title){ toast('Isi judul catatan!','error'); return; }
+  const id = document.getElementById('healthId').value;
+  const data = {
+    id:id||uid(), catId, title, date,
+    type:   document.getElementById('healthType').value,
+    note:   document.getElementById('healthNote').value.trim(),
+    doctor: document.getElementById('healthDoctor').value.trim(),
+    weight: parseFloat(document.getElementById('healthWeight').value)||null,
+    createdAt: new Date().toISOString(),
+  };
+  if(id) health = health.map(h=>h.id===id?data:h);
+  else health.push(data);
+  save(KEY.health, health);
+  closeModal('healthModal');
+  renderHealth();
+  renderDashboard();
+  toast(`Catatan disimpan! 💊`,'success');
+}
+
+function deleteHealth(id){
+  if(!confirm('Hapus catatan ini?')) return;
+  health = health.filter(h=>h.id!==id);
+  save(KEY.health, health);
+  renderHealth();
+  toast('Catatan dihapus','info');
+}
+
+function renderHealth(){
+  const catFilter = document.getElementById('filterHealthCat')?.value||'';
+  let filtered = health;
+  if(catFilter) filtered = filtered.filter(h=>h.catId===catFilter);
+  filtered = filtered.sort((a,b)=>b.date.localeCompare(a.date));
+
+  const list = document.getElementById('healthList');
+  if(!filtered.length){
+    list.innerHTML='<div class="empty"><div class="icon">💊</div><p>Belum ada catatan kesehatan</p></div>'; return;
+  }
+
+  list.innerHTML = filtered.map(h=>{
+    const cat = getCat(h.catId);
+    const cfg = typeConfig[h.type]||typeConfig.lainnya;
+    return `<div class="log-item">
+      <div class="log-top">
+        <div class="log-title">${cfg.icon} ${h.title}</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="log-date">${fmtDate(h.date)}</div>
+          <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:.65rem;" data-action-h="edit-health" data-id="${h.id}">✏️</button>
+          <button class="btn btn-danger btn-sm" style="padding:2px 8px;font-size:.65rem;" data-action-h="del-health" data-id="${h.id}">🗑</button>
+        </div>
+      </div>
+      <div style="font-size:.75rem;color:var(--text3);margin-bottom:4px;">${cat.emoji||'🐱'} ${cat.name||'—'}${h.doctor?' · '+h.doctor:''}${h.weight?' · ⚖️ '+h.weight+'kg':''}</div>
+      ${h.note?`<div class="log-note">${h.note}</div>`:''}
+      <div class="log-tags"><span class="log-tag" style="background:${cfg.color};color:${cfg.text};">${cfg.label}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// MOMENTS
+// ═══════════════════════════════════════════
+function openAddMomentModal(id){
+  populateCatSelect('momentCat');
+  document.getElementById('momentDate').value = today();
+  document.getElementById('momentId').value = '';
+  ['momentTitle','momentNote'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('momentEmoji').value = '🥰';
+  resetPhotoUpload();
+  if(id){
+    const m = moments.find(x=>x.id===id);
+    if(m){
+      document.getElementById('momentId').value    = m.id;
+      document.getElementById('momentCat').value   = m.catId;
+      document.getElementById('momentDate').value  = m.date;
+      document.getElementById('momentEmoji').value = m.emoji;
+      document.getElementById('momentTitle').value = m.title;
+      document.getElementById('momentNote').value  = m.note||'';
+      // Load existing photo
+      if(m.photo){
+        currentPhoto = m.photo;
+        document.getElementById('photoPreviewImg').src = m.photo;
+        document.getElementById('photoPreview').style.display = 'block';
+        document.getElementById('photoPlaceholder').style.display = 'none';
+      }
+    }
+  }
+  document.getElementById('momentModal').classList.add('open');
+}
+
+function saveMoment(){
+  const catId = document.getElementById('momentCat').value;
+  const title = document.getElementById('momentTitle').value.trim();
+  if(!catId){ toast('Pilih kucing dulu! 🐱','error'); return; }
+  if(!title){ toast('Isi judul momen!','error'); return; }
+  const id = document.getElementById('momentId').value;
+  const data = {
+    id:id||uid(), catId, title,
+    date:  document.getElementById('momentDate').value,
+    emoji: document.getElementById('momentEmoji').value,
+    note:  document.getElementById('momentNote').value.trim(),
+    photo: currentPhoto||null,
+    createdAt: new Date().toISOString(),
+  };
+  if(id) moments = moments.map(m=>m.id===id?data:m);
+  else moments.push(data);
+  try {
+    save(KEY.moments, moments);
+  } catch(e){
+    // Storage full — try without photo
+    data.photo = null;
+    moments = moments.map(m=>m.id===data.id?data:m);
+    save(KEY.moments, moments);
+    toast('Storage penuh, foto tidak tersimpan. Hapus momen lama! ⚠️','error');
+    closeModal('momentModal');
+    renderMoments(); renderDashboard();
+    return;
+  }
+  resetPhotoUpload();
+  closeModal('momentModal');
+  renderMoments();
+  renderDashboard();
+  toast(`Momen ${title} diabadikan! 📸`,'success');
+}
+
+function deleteMoment(id){
+  if(!confirm('Hapus momen ini?')) return;
+  moments = moments.filter(m=>m.id!==id);
+  save(KEY.moments, moments);
+  renderMoments();
+  renderDashboard();
+  toast('Momen dihapus','info');
+}
+
+function renderMoments(){
+  const grid = document.getElementById('momentGrid');
+  const sorted = [...moments].sort((a,b)=>b.date.localeCompare(a.date));
+  if(!sorted.length){
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="icon">🥰</div><p>Belum ada momen tercatat.<br>Abadikan kelucuan anabul kamu!</p></div>'; return;
+  }
+  grid.innerHTML = sorted.map(m=>{
+    const cat = getCat(m.catId);
+    return `<div class="moment-card">
+      ${m.photo?`<div style="margin:-16px -16px 12px;border-radius:16px 16px 0 0;overflow:hidden;height:160px;">
+        <img src="${m.photo}" style="width:100%;height:100%;object-fit:cover;">
+      </div>`:`<div class="moment-emoji">${m.emoji}</div>`}
+      <div class="moment-title">${m.emoji} ${m.title}</div>
+      ${m.note?`<div class="moment-note">${m.note}</div>`:''}
+      <div class="moment-footer">
+        <div class="moment-date">${fmtDate(m.date)}</div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="moment-cat-tag">${cat.emoji||'🐱'} ${cat.name||'—'}</span>
+          <button class="btn btn-ghost btn-sm" style="padding:2px 7px;font-size:.65rem;" data-action-m="edit-moment" data-id="${m.id}">✏️</button>
+          <button class="btn btn-danger btn-sm" style="padding:2px 7px;font-size:.65rem;" data-action-m="del-moment" data-id="${m.id}">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════
+function renderDashboard(){
+  // Stats
+  const urgentCount = schedules.filter(s=>{ const d=daysUntil(s.date); return !s.done&&d>=0&&d<=3; }).length;
+  const soonCount   = schedules.filter(s=>{ const d=daysUntil(s.date); return !s.done&&d>3&&d<=7; }).length;
+
+  document.getElementById('statCats').textContent    = cats.length;
+  document.getElementById('statUrgent').textContent  = urgentCount;
+  document.getElementById('statSoon').textContent    = soonCount;
+  document.getElementById('statMoments').textContent = moments.length;
+
+  // Alerts
+  const alertsEl = document.getElementById('dashAlerts');
+  const urgentScheds = schedules.filter(s=>{ const d=daysUntil(s.date); return !s.done&&d>=0&&d<=1; }).slice(0,3);
+  const soonScheds   = schedules.filter(s=>{ const d=daysUntil(s.date); return !s.done&&d>1&&d<=7; }).slice(0,2);
+
+  let alertsHtml = '';
+  urgentScheds.forEach(s=>{
+    const cat=getCat(s.catId); const d=daysUntil(s.date);
+    alertsHtml += `<div class="alert-box urgent">
+      <span style="font-size:1.3rem;">🚨</span>
+      <p>${cat.emoji||'🐱'} <strong>${cat.name}</strong> — ${s.name} ${d===0?'<strong>HARI INI!</strong>':`dalam ${d} hari`}
+      <button class="btn btn-gcal btn-sm" style="margin-left:8px;padding:3px 10px;font-size:.68rem;" onclick="addToGCalDirect('${s.id}')">📅 Google Cal</button></p>
+    </div>`;
+  });
+  soonScheds.forEach(s=>{
+    const cat=getCat(s.catId); const d=daysUntil(s.date);
+    alertsHtml += `<div class="alert-box soon">
+      <span style="font-size:1.3rem;">📅</span>
+      <p>${cat.emoji||'🐱'} <strong>${cat.name}</strong> — ${s.name} dalam <strong>${d} hari</strong>
+      <button class="btn btn-gcal btn-sm" style="margin-left:8px;padding:3px 10px;font-size:.68rem;" onclick="addToGCalDirect('${s.id}')">📅 Google Cal</button></p>
+    </div>`;
+  });
+  alertsEl.innerHTML = alertsHtml;
+
+  // Cat list
+  const catsEl = document.getElementById('dashCatsList');
+  if(!cats.length){
+    catsEl.innerHTML='<div class="empty"><div class="icon">🐱</div><p>Belum ada kucing.<br>Tambah anabul pertama!</p></div>';
+  } else {
+    catsEl.innerHTML = cats.map((c,i)=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="showCatDetail('${c.id}')">
+        <div style="width:36px;height:36px;border-radius:10px;background:${catColors[i%catColors.length]}33;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">${c.emoji||'🐱'}</div>
+        <div style="flex:1"><div style="font-weight:800;font-size:.88rem;">${c.name}</div><div style="font-size:.72rem;color:var(--text3);">${calcAge(c.birthdate)} · ${c.gender==='betina'?'♀':'♂'}</div></div>
+        <span style="font-size:.7rem;">›</span>
+      </div>`).join('');
+  }
+
+  // Upcoming schedules
+  const schedEl = document.getElementById('dashSchedule');
+  const upcoming = schedules.filter(s=>!s.done&&daysUntil(s.date)>=0).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,4);
+  if(!upcoming.length){
+    schedEl.innerHTML='<div class="empty"><div class="icon">📅</div><p>Tidak ada jadwal mendatang</p></div>';
+  } else {
+    schedEl.innerHTML = upcoming.map(s=>{
+      const cat=getCat(s.catId); const d=daysUntil(s.date); const cfg=typeConfig[s.type]||typeConfig.lainnya;
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:1.1rem;">${cfg.icon}</span>
+        <div style="flex:1"><div style="font-weight:700;font-size:.82rem;">${s.name}</div><div style="font-size:.7rem;color:var(--text3);">${cat.emoji||'🐱'} ${cat.name}</div></div>
+        <div style="text-align:right"><div style="font-size:.72rem;font-weight:800;color:${d<=3?'var(--red)':d<=7?'#e6a817':'#2e9e6b'};">${d===0?'Hari ini!':d+'h lagi'}</div></div>
+      </div>`;
+    }).join('');
+  }
+
+  // Recent moments
+  const momEl = document.getElementById('dashMoments');
+  const recentMom = [...moments].sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).slice(0,3);
+  if(!recentMom.length){
+    momEl.innerHTML='<div class="empty"><div class="icon">📸</div><p>Belum ada momen</p></div>';
+  } else {
+    momEl.innerHTML = `<div style="display:flex;gap:12px;flex-wrap:wrap;">` + recentMom.map(m=>{
+      const cat=getCat(m.catId);
+      return `<div style="flex:1;min-width:160px;background:var(--pink3);border-radius:14px;padding:12px;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:6px;">${m.emoji}</div>
+        <div style="font-weight:800;font-size:.8rem;margin-bottom:3px;">${m.title}</div>
+        <div style="font-size:.68rem;color:var(--text3);">${cat.emoji||'🐱'} ${cat.name} · ${fmtDate(m.date)}</div>
+      </div>`;
+    }).join('') + `</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function populateCatSelect(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const cur = el.value;
+  el.innerHTML = '<option value="">— Pilih Kucing —</option>' +
+    cats.map(c=>`<option value="${c.id}">${c.emoji||'🐱'} ${c.name}</option>`).join('');
+  if(cur) el.value = cur;
+}
+
+function populateCatSelects(){
+  ['schedCat','healthCat','momentCat','filterHealthCat'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    const cur = el.value;
+    const isFilter = id==='filterHealthCat';
+    el.innerHTML = (isFilter?'<option value="">🐱 Semua Kucing</option>':'<option value="">— Pilih Kucing —</option>') +
+      cats.map(c=>`<option value="${c.id}">${c.emoji||'🐱'} ${c.name}</option>`).join('');
+    if(cur) el.value = cur;
+  });
+}
+
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+function toast(msg,type='info'){
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),3000);
+}
+
+// ── Confirm custom (lebih reliable) ──
+function confirmAction(msg, cb){
+  const ov = document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(61,44,53,.5);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML=`<div style="background:#fff5f7;border:2px solid #fce4ec;border-radius:20px;padding:28px;max-width:320px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(255,143,171,.25);">
+    <div style="font-size:2rem;margin-bottom:10px;">🗑️</div>
+    <div style="font-family:'Fredoka One',sans-serif;font-size:1.1rem;margin-bottom:8px;">Yakin dihapus?</div>
+    <div style="font-size:.84rem;color:#8b6b75;margin-bottom:20px;">${msg}</div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button id="_cfmYes" style="background:linear-gradient(135deg,#ff8fab,#ffb3c6);color:#fff;border:none;border-radius:12px;padding:10px 24px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;">Ya, Hapus</button>
+      <button id="_cfmNo" style="background:#fce4ec;color:#ff8fab;border:2px solid #ffb3c6;border-radius:12px;padding:10px 24px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;">Batal</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.querySelector('#_cfmYes').onclick = ()=>{ ov.remove(); cb(); };
+  ov.querySelector('#_cfmNo').onclick  = ()=>{ ov.remove(); };
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.remove(); });
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  populateCatSelects();
+  renderDashboard();
+
+  // Modal overlay close
+  document.querySelectorAll('.modal-overlay').forEach(m=>{
+    m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); });
+  });
+
+  // ── Foto upload listener ──
+  document.getElementById('momentPhotoInput').addEventListener('change', function(){
+    handlePhotoUpload(this);
+  });
+
+  // ── Event delegation KUCING ──
+  document.getElementById('catsGrid').addEventListener('click', function(e){
+    const btn = e.target.closest('[data-action-c]');
+    if(!btn) return;
+    const action = btn.dataset.actionC;
+    const id     = btn.dataset.id;
+    if(action==='detail-cat') showCatDetail(id);
+    if(action==='edit-cat')   openAddCatModal(id);
+    if(action==='del-cat'){
+      const c = getCat(id);
+      confirmAction(`${c.name} dan semua data terkait akan dihapus permanen.`, ()=>{
+        cats      = cats.filter(x=>x.id!==id);
+        schedules = schedules.filter(x=>x.catId!==id);
+        health    = health.filter(x=>x.catId!==id);
+        moments   = moments.filter(x=>x.catId!==id);
+        save(KEY.cats,cats); save(KEY.schedules,schedules);
+        save(KEY.health,health); save(KEY.moments,moments);
+        renderCats();
+        renderDashboard();
+        populateCatSelects();
+        toast(`${c.name} dihapus 😢`,'info');
+      });
+    }
+  });
+
+  // ── Event delegation JADWAL ──
+  document.getElementById('schedList').addEventListener('click', function(e){
+    const btn = e.target.closest('[data-action]');
+    if(!btn) return;
+    const action = btn.dataset.action;
+    const id     = btn.dataset.id;
+    if(action==='edit-sched') openAddScheduleModal(id);
+    if(action==='done-sched') markScheduleDone(id);
+    if(action==='gcal-sched') addToGCalDirect(id);
+    if(action==='del-sched'){
+      confirmAction('Jadwal ini akan dihapus permanen.', ()=>{
+        schedules = schedules.filter(s=>s.id!==id);
+        save(KEY.schedules, schedules);
+        renderSchedule(currentSchedFilter);
+        renderDashboard();
+        toast('Jadwal dihapus 🗑','info');
+      });
+    }
+  });
+
+  // ── Event delegation KESEHATAN ──
+  document.getElementById('healthList').addEventListener('click', function(e){
+    const btn = e.target.closest('[data-action-h]');
+    if(!btn) return;
+    const action = btn.dataset.actionH;
+    const id     = btn.dataset.id;
+    if(action==='edit-health') openAddHealthModal(id);
+    if(action==='del-health'){
+      confirmAction('Catatan kesehatan ini akan dihapus.', ()=>{
+        health = health.filter(h=>h.id!==id);
+        save(KEY.health, health);
+        renderHealth();
+        toast('Catatan dihapus 🗑','info');
+      });
+    }
+  });
+
+  // ── Event delegation MOMEN ──
+  document.getElementById('momentGrid').addEventListener('click', function(e){
+    const btn = e.target.closest('[data-action-m]');
+    if(!btn) return;
+    const action = btn.dataset.actionM;
+    const id     = btn.dataset.id;
+    if(action==='edit-moment') openAddMomentModal(id);
+    if(action==='del-moment'){
+      confirmAction('Momen ini akan dihapus permanen.', ()=>{
+        moments = moments.filter(m=>m.id!==id);
+        save(KEY.moments, moments);
+        renderMoments();
+        renderDashboard();
+        toast('Momen dihapus 🗑','info');
+      });
+    }
+  });
+
+  // Check upcoming on load
+  const urgentCount = schedules.filter(s=>{ const d=daysUntil(s.date); return !s.done&&d>=0&&d<=3; }).length;
+  if(urgentCount>0) toast(`⚠️ Ada ${urgentCount} jadwal mendesak!`,'error');
+});
+</script>
+</body>
+</html>
