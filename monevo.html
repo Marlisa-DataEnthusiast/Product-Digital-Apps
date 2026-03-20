@@ -1422,15 +1422,8 @@ let reportTab = 'monthly';
 // ══════════════════════════════════════════════════════
 // PERSISTENCE
 // ══════════════════════════════════════════════════════
-function save() { localStorage.setItem('monevo_v1', JSON.stringify(S)); }
-function load() {
-  const raw = localStorage.getItem('monevo_v1');
-  if (raw) {
-    const d = JSON.parse(raw);
-    S = { ...S, ...d };
-    if (d.categories && d.categories.length) S.categories = d.categories;
-  }
-}
+function save() { /* in-memory only — no localStorage */ }
+function load() { /* in-memory only — data lives in S */ }
 
 // ══════════════════════════════════════════════════════
 // FORMATTING
@@ -2490,8 +2483,16 @@ function handleImport(e) {
 function clearAllData() {
   if (!confirm('Clear ALL data? This cannot be undone.')) return;
   if (!confirm('Are you sure? All transactions, accounts, goals and settings will be deleted.')) return;
-  localStorage.removeItem('monevo_v1');
-  location.reload();
+  S.transactions = [];
+  S.accounts = [];
+  S.budgets = [];
+  S.goals = [];
+  S.debts = [];
+  S.investments = [];
+  S.settings = { currency: 'Rp', theme: S.settings.theme || 'dark' };
+  renderAll();
+  nav('dashboard');
+  toast('All data cleared');
 }
 
 // ══════════════════════════════════════════════════════
